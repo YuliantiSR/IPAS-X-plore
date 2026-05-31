@@ -1,0 +1,997 @@
+<!doctype html>
+<html lang="id" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IPAS X-plore</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { poppins: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        primary: { 50:'#f5f3ff',100:'#ede9fe',200:'#ddd6fe',300:'#c4b5fd',400:'#a78bfa',500:'#8b5cf6',600:'#7c3aed',700:'#6d28d9',800:'#5b21b6',900:'#4c1d95' },
+                        accent: { 50:'#ecfdf5',100:'#d1fae5',200:'#a7f3d0',300:'#6ee7b7',400:'#34d399',500:'#10b981',600:'#059669' },
+                        sky: { 50:'#f0f9ff',100:'#e0f2fe',200:'#bae6fd',300:'#7dd3fc',400:'#38bdf8',500:'#0ea5e9' }
+                    }
+                }
+            }
+        }
+    </script>
+  <style>
+        * { font-family: 'Poppins', sans-serif; box-sizing: border-box; }
+        html, body { height: 100%; margin: 0; }
+        .glass { background: rgba(255,255,255,0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.3); }
+        .card-hover { transition: all .3s ease; }
+        .card-hover:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 25px 50px rgba(139,92,246,.2); }
+        .sidebar-item { transition: all .2s ease; }
+        .sidebar-item:hover, .sidebar-item.active { background: rgba(139,92,246,.1); color: #7c3aed; }
+        .fade-in { animation: fadeIn .4s ease; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        .progress-bar { transition: width .8s ease; }
+        .stat-card, .testimonial-card { transition: all .3s ease; }
+        .stat-card:hover, .testimonial-card:hover { transform: translateY(-6px); }
+        .nav-link { position: relative; }
+        .nav-link::after { content:''; position:absolute; left:0; bottom:-2px; width:0; height:2px; background:linear-gradient(to right,#7c3aed,#06b6d4); transition:width .3s ease; }
+        .nav-link:hover::after { width:100%; }
+        .sticky-nav { position:sticky; top:0; z-index:40; background:white; }
+        .pattern-bg { background-image: radial-gradient(circle at 20% 50%,rgba(124,58,237,.03) 0%,transparent 50%), radial-gradient(circle at 80% 80%,rgba(16,185,129,.03) 0%,transparent 50%); }
+        ::-webkit-scrollbar { width:6px; }
+        ::-webkit-scrollbar-thumb { background:#c4b5fd; border-radius:3px; }
+        .toast { position:fixed; top:20px; right:20px; z-index:9999; padding:12px 20px; border-radius:12px; font-size:14px; font-weight:500; animation:fadeIn .3s ease; }
+    </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ <script src="/_sdk/telemetry_sdk.js"></script></head>
+ <body class="h-full bg-gray-50 font-poppins overflow-auto">
+  <div id="app" class="h-full w-full"></div>
+  <script>
+// =======================
+// APPLICATION STATE
+// =======================
+let currentPage = "landing";
+let userRole = null;
+let userName = "";
+let userClass = "X-A";
+let currentMateri = 1;
+
+let quizAnswers = {};
+let quizSubmitted = false;
+
+// =======================
+// CONFIG
+// =======================
+const defaultConfig = {
+    nav_title: "IPAS X-plore",
+    hero_desc: "Platform pembelajaran digital untuk eksplorasi sains, teknologi, lingkungan, dan masyarakat melalui praktikum virtual dan proyek berbasis masalah nyata.",
+    about_name: "Yulianti Sri Rahayu",
+    about_position: "Guru IPAS",
+    primary_color: "#7c3aed",
+    surface_color: "#ffffff",
+    text_color: "#1f2937",
+    action_color: "#10b981",
+    secondary_action_color: "#0ea5e9",
+    font_family: "Poppins",
+    font_size: 16
+};
+
+function showToast(msg, type) {
+    const t = document.createElement('div');
+    t.className = `toast ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+}
+
+// =======================
+// LOGIN SYSTEM
+// =======================
+function loginUser() {
+    const nama = document.getElementById("nama-user").value.trim();
+    const nomor = document.getElementById("nomor-user").value.trim();
+    const peran = document.getElementById("peran-user").value;
+    if (!nama) { showToast("Nama lengkap harus diisi", "error"); return; }
+    if (!nomor) { showToast("NIP atau Nomor Absen harus diisi", "error"); return; }
+    if (!peran) { showToast("Silakan pilih peran", "error"); return; }
+    userName = nama;
+    userRole = peran;
+    if (peran === "guru") { navigate("dashboard-guru"); }
+    else { navigate("dashboard-siswa"); }
+}
+
+// =======================
+// DATA
+// =======================
+const stats = { siswa:248, materi:32, praktikum:18, proyek:12, soal:156, rataRata:78.5 };
+
+const materiList = [
+    { id:1, title:"Ciri Makhluk Hidup", desc:"Memahami karakteristik dan sifat-sifat makhluk hidup", icon:"🧬", progress:90 },
+    { id:2, title:"Ekosistem", desc:"Komponen dan struktur ekosistem serta hubungan antar organisme", icon:"🌍", progress:85 },
+    { id:3, title:"Interaksi Dalam Ekosistem", desc:"Simbiosis, predasi, dan kompetisi dalam alam", icon:"🤝", progress:60 },
+    { id:4, title:"Pencemaran dan Pelestarian Lingkungan", desc:"Keanekaragaman hayati dan upaya konservasi", icon:"🌱", progress:40 }
+];
+
+const labList = [
+    { id:1, title:"Pengukuran Massa dan Volume", cat:"🔬 Pengukuran", desc:"Simulasi penggunaan neraca dan gelas ukur" },
+    { id:3, title:"Rantai Makanan Ekosistem", cat:"🌱 Ekosistem", desc:"Simulasi jaring-jaring makanan" },
+    { id:5, title:"Siklus Air", cat:"💧 Siklus Air", desc:"Simulasi evaporasi dan kondensasi" },
+    { id:6, title:"Perpindahan Kalor", cat:"🌡️ Suhu dan Kalor", desc:"Eksperimen konduksi, konveksi, radiasi" }
+];
+
+const proyekList = [
+    { id:1, title:"Pengelolaan Sampah Sekolah", icon:"🌱", progress:75, deadline:"15 Mar 2025" },
+    { id:2, title:"Konservasi Air Bersih", icon:"💧", progress:50, deadline:"22 Mar 2025" },
+    { id:3, title:"Kampanye Pemanasan Global", icon:"🌍", progress:30, deadline:"1 Apr 2025" },
+    { id:4, title:"Energi Terbarukan Mini", icon:"⚡", progress:60, deadline:"10 Apr 2025" },
+    { id:5, title:"Penghijauan Lingkungan", icon:"🌳", progress:20, deadline:"20 Apr 2025" },
+    { id:6, title:"Daur Ulang Kreatif", icon:"♻️", progress:90, deadline:"5 Mar 2025" }
+];
+
+const siswaList = [
+    { nama:"Aisyah Putri", kelas:"X-A", nilai:95, nis:"12001" },
+    { nama:"Budi Santoso", kelas:"X-A", nilai:92, nis:"12002" },
+    { nama:"Citra Dewi", kelas:"X-B", nilai:90, nis:"12003" },
+    { nama:"Dimas Pratama", kelas:"X-A", nilai:88, nis:"12004" },
+    { nama:"Eka Saputra", kelas:"X-B", nilai:85, nis:"12005" },
+    { nama:"Fitri Handayani", kelas:"X-C", nilai:83, nis:"12006" },
+    { nama:"Gilang Ramadhan", kelas:"X-A", nilai:80, nis:"12007" },
+    { nama:"Hana Safitri", kelas:"X-B", nilai:78, nis:"12008" }
+];
+
+const soalList = [
+    { id:1, type:"Pilihan Ganda", materi:"Ciri Makhluk Hidup", soal:"Apa fungsi utama respirasi pada makhluk hidup?", options:["Memperoleh energi","Menghasilkan makanan","Berkembang biak","Mengeluarkan zat sisa"], answer:0 },
+    { id:2, type:"Benar/Salah", materi:"Ciri Makhluk Hidup", soal:"Tumbuhan juga bernapas sepanjang waktu meskipun menghasilkan oksigen saat fotosintesis", answer:true },
+    { id:3, type:"Pilihan Ganda", materi:"Ciri Makhluk Hidup", soal:"Organisme yang dapat membuat makanannya sendiri adalah...", options:["Manusia","Hewan","Tumbuhan","Bakteri patogen"], answer:2 },
+    { id:4, type:"Pilihan Ganda", materi:"Ciri Makhluk Hidup", soal:"Contoh makhluk hidup yang bergerak mengikuti cahaya...", options:["Kucing berlari","Bunga matahari mengikuti matahari","Ikan berenang","Manusia berjalan"], answer:1 },
+    { id:5, type:"Benar/Salah", materi:"Ciri Makhluk Hidup", soal:"Pertumbuhan dan perkembangan adalah proses yang sama", answer:false },
+    { id:6, type:"Pilihan Ganda", materi:"Ciri Makhluk Hidup", soal:"Hewan yang bertelur disebut...", options:["Vivipar","Ovipar","Ovovivipar","Aseksual"], answer:1 },
+    { id:7, type:"Pilihan Ganda", materi:"Ciri Makhluk Hidup", soal:"Penutupan daun putri malu adalah respons terhadap rangsangan...", options:["Cahaya","Sentuhan","Panas","Dingin"], answer:1 },
+    { id:8, type:"Pilihan Ganda", materi:"Ciri Makhluk Hidup", soal:"Berikut yang bukan zat sisa metabolisme adalah...", options:["Keringat","Urine","Darah","Karbon dioksida"], answer:2 }
+];
+
+// =======================
+// NAVIGATION
+// =======================
+function navigate(page) {
+    currentPage = page;
+    quizSubmitted = false;
+    quizAnswers = {};
+    render();
+}
+
+// =======================
+// MAIN RENDER
+// =======================
+function render() {
+    const app = document.getElementById("app");
+    if (!app) return;
+    let html = "";
+    switch (currentPage) {
+        case "landing": html = renderLanding(); break;
+        case "login-guru": case "login-siswa": html = renderLogin(); break;
+        case "dashboard-guru": html = renderDashboardGuru(); break;
+        case "materi-guru": html = renderMateriGuru(); break;
+        case "lab-guru": html = renderLabGuru(); break;
+        case "proyek-guru": html = renderProyekGuru(); break;
+        case "bank-soal": html = renderBankSoal(); break;
+        case "penilaian": html = renderPenilaian(); break;
+        case "statistik": html = renderStatistik(); break;
+        case "ranking-guru": html = renderRanking(); break;
+        case "dashboard-siswa": html = renderDashboardSiswa(); break;
+        case "materi-siswa": html = renderMateriSiswa(); break;
+        case "materi-detail": html = renderMateriDetail(); break;
+        case "lab-siswa": html = renderLabSiswa(); break;
+        case "proyek-siswa": html = renderProyekSiswa(); break;
+        case "kerjakan-soal": html = renderKerjakanSoal(); break;
+        case "nilai-saya": html = renderNilaiSaya(); break;
+        case "ranking-siswa": html = renderRankingSiswa(); break;
+        case "profil-saya": html = renderProfilSaya(); break;
+        default: html = renderLanding();
+    }
+    app.innerHTML = html;
+    if (window.lucide) lucide.createIcons();
+}
+
+// =======================
+// LANDING PAGE
+// =======================
+function renderLanding() {
+    const cfg = window.elementSdk ? window.elementSdk.config : defaultConfig;
+    return `
+<div class="w-full">
+<!-- Nav -->
+<nav class="sticky-nav flex items-center justify-between px-6 py-3.5 md:px-12 bg-white border-b border-gray-100">
+    <div class="flex items-center gap-2.5">
+        <div class="w-12 h-12 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">X</div>
+        <div>
+            <span class="text-gray-900 font-bold text-base block leading-tight" id="nav-title">${cfg.nav_title || defaultConfig.nav_title}</span>
+            <span class="text-xs text-primary-500 font-medium">Explore • Learn • Discover</span>
+        </div>
+    </div>
+    <div class="hidden md:flex items-center gap-6">
+        <a href="#fitur" class="nav-link text-sm text-gray-600 hover:text-primary-600 font-medium">Fitur</a>
+        <a href="#lab" class="nav-link text-sm text-gray-600 hover:text-primary-600 font-medium">Lab</a>
+        <a href="#proyek" class="nav-link text-sm text-gray-600 hover:text-primary-600 font-medium">Proyek</a>
+        <a href="#tentang" class="nav-link text-sm text-gray-600 hover:text-primary-600 font-medium">Tentang</a>
+        <button onclick="navigate('login-guru')" class="px-5 py-2 bg-primary-600 text-white text-sm font-semibold rounded-lg hover:bg-primary-700 transition">Masuk</button>
+    </div>
+    <button onclick="navigate('login-guru')" class="md:hidden px-4 py-2 bg-primary-600 text-white text-sm rounded-lg">Masuk</button>
+</nav>
+
+<!-- Hero -->
+<div class="relative overflow-hidden bg-gradient-to-br from-primary-50 via-white to-sky-50 py-16 md:py-24 px-6 md:px-12">
+    <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-10 items-center">
+        <div class="order-2 md:order-1 fade-in">
+            <div class="inline-flex items-center gap-2 bg-primary-100 border border-primary-200 rounded-full px-4 py-1.5 text-primary-700 text-xs font-semibold mb-6">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>Platform Pembelajaran Digital
+            </div>
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 mb-4 leading-tight">
+                IPAS <span class="bg-gradient-to-r from-primary-600 to-sky-500 bg-clip-text text-transparent">X-plore</span>
+            </h1>
+            <p class="text-base md:text-lg text-gray-700 mb-8 leading-relaxed max-w-lg" id="hero-desc">${cfg.hero_desc || defaultConfig.hero_desc}</p>
+            <div class="flex flex-col sm:flex-row gap-3 mb-10">
+                <button onclick="navigate('login-guru')" class="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all shadow-lg hover:shadow-xl hover:scale-105 flex items-center justify-center gap-2 text-sm">
+                    <i data-lucide="graduation-cap" class="w-5 h-5"></i>👩‍🏫 Masuk Sebagai Guru
+                </button>
+                <button onclick="navigate('login-siswa')" class="px-6 py-3 bg-white border-2 border-accent-500 text-accent-600 font-semibold rounded-lg hover:bg-accent-50 transition-all shadow-md hover:shadow-lg hover:scale-105 flex items-center justify-center gap-2 text-sm">
+                    <i data-lucide="book-open" class="w-5 h-5"></i>👨‍🎓 Masuk Sebagai Siswa
+                </button>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="text-center p-3 bg-white/70 backdrop-blur rounded-lg border border-gray-100/50"><div class="text-2xl font-bold text-primary-600">248</div><div class="text-xs text-gray-600">Siswa</div></div>
+                <div class="text-center p-3 bg-white/70 backdrop-blur rounded-lg border border-gray-100/50"><div class="text-2xl font-bold text-accent-600">32</div><div class="text-xs text-gray-600">Materi</div></div>
+                <div class="text-center p-3 bg-white/70 backdrop-blur rounded-lg border border-gray-100/50"><div class="text-2xl font-bold text-sky-600">18</div><div class="text-xs text-gray-600">Praktikum</div></div>
+                <div class="text-center p-3 bg-white/70 backdrop-blur rounded-lg border border-gray-100/50"><div class="text-2xl font-bold text-green-600">98%</div><div class="text-xs text-gray-600">Puas</div></div>
+            </div>
+        </div>
+        <div class="order-1 md:order-2 flex items-center justify-center">
+            <svg viewBox="0 0 400 400" class="w-64 h-64 md:w-80 md:h-80 drop-shadow-2xl" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#7c3aed"/><stop offset="100%" style="stop-color:#10b981"/></linearGradient>
+                </defs>
+                <g transform="translate(200,200)">
+                    <circle r="85" fill="url(#grad1)" opacity="0.95"/>
+                    <g transform="translate(0,-110)"><circle r="40" fill="white" opacity="0.98"/><text x="0" y="8" text-anchor="middle" font-size="32">🔬</text></g>
+                    <g transform="translate(78,60)"><circle r="40" fill="white" opacity="0.98"/><text x="0" y="8" text-anchor="middle" font-size="32">🌍</text></g>
+                    <g transform="translate(-78,60)"><circle r="40" fill="white" opacity="0.98"/><text x="0" y="8" text-anchor="middle" font-size="32">⚛️</text></g>
+                    <circle r="32" fill="white"/><text x="0" y="12" text-anchor="middle" font-size="36">📚</text>
+                </g>
+            </svg>
+        </div>
+    </div>
+</div>
+
+<!-- Fitur Unggulan -->
+<div id="fitur" class="bg-white py-16 md:py-24 px-6 md:px-8 border-t border-gray-100">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-14">
+            <div class="inline-flex items-center gap-2 bg-primary-50 border border-primary-200 rounded-full px-4 py-2 text-primary-700 text-xs font-semibold mb-4"><i data-lucide="star" class="w-3.5 h-3.5"></i>Unggulan</div>
+            <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">Tiga Pilar Pembelajaran IPAS</h2>
+            <p class="text-base text-gray-600 max-w-2xl mx-auto">Eksplorasi, pembelajaran interaktif, dan proyek berbasis masalah nyata</p>
+        </div>
+        <div class="grid md:grid-cols-3 gap-6 lg:gap-8">
+            <div class="group bg-gradient-to-br from-sky-50 to-sky-100/30 rounded-2xl p-7 border border-sky-200/50 shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+                <div class="w-14 h-14 bg-gradient-to-br from-sky-400 to-sky-500 rounded-xl flex items-center justify-center text-white mb-6 shadow-lg"><i data-lucide="flask-conical" class="w-6 h-6"></i></div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">Laboratorium Virtual</h3>
+                <p class="text-gray-700 leading-relaxed mb-5 text-sm">Simulasi eksperimen digital interaktif tanpa keterbatasan ruang, waktu, dan biaya.</p>
+                <ul class="space-y-2.5 text-sm text-gray-700">
+                    <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-sky-500 flex-shrink-0"></i>18 eksperimen tersedia</li>
+                    <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-sky-500 flex-shrink-0"></i>Hasil akurat dan terukur</li>
+                    <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-sky-500 flex-shrink-0"></i>Laporan otomatis</li>
+                </ul>
+            </div>
+            <div class="group bg-gradient-to-br from-accent-50 to-accent-100/30 rounded-2xl p-7 border border-accent-200/50 shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+                <div class="w-14 h-14 bg-gradient-to-br from-accent-400 to-accent-500 rounded-xl flex items-center justify-center text-white mb-6 shadow-lg"><i data-lucide="globe" class="w-6 h-6"></i></div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">Proyek IPAS</h3>
+                <p class="text-gray-700 leading-relaxed mb-5 text-sm">Pembelajaran berbasis masalah nyata yang mengembangkan keterampilan 4C siswa.</p>
+                <ul class="space-y-2.5 text-sm text-gray-700">
+                    <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-accent-500 flex-shrink-0"></i>12 proyek aktif</li>
+                    <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-accent-500 flex-shrink-0"></i>Berbasis masalah nyata</li>
+                    <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-accent-500 flex-shrink-0"></i>Kolaborasi tim</li>
+                </ul>
+            </div>
+            <div class="group bg-gradient-to-br from-primary-50 to-primary-100/30 rounded-2xl p-7 border border-primary-200/50 shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+                <div class="w-14 h-14 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center text-white mb-6 shadow-lg"><i data-lucide="bar-chart-2" class="w-6 h-6"></i></div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">Evaluasi Digital</h3>
+                <p class="text-gray-700 leading-relaxed mb-5 text-sm">Sistem penilaian komprehensif dengan feedback langsung dan analitik mendalam.</p>
+                <ul class="space-y-2.5 text-sm text-gray-700">
+                    <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-primary-600 flex-shrink-0"></i>156 soal tersedia</li>
+                    <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-primary-600 flex-shrink-0"></i>Feedback langsung</li>
+                    <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-primary-600 flex-shrink-0"></i>Analytics mendalam</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistik -->
+<div class="bg-gray-50 py-16 px-6 md:px-8 pattern-bg">
+    <div class="max-w-7xl mx-auto">
+        <h2 class="text-center text-3xl md:text-4xl font-black text-gray-900 mb-4">Platform Kami Dalam Angka</h2>
+        <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">Berkembang bersama siswa yang telah merasakan manfaat pembelajaran IPAS modern</p>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            ${[{i:'📚',v:'32',l:'Materi',s:'+5 baru'},{i:'🧪',v:'18',l:'Praktikum',s:'Aktif'},{i:'🌍',v:'12',l:'Proyek',s:'Berlangsung'},{i:'📝',v:'156',l:'Evaluasi',s:'Tersedia'},{i:'👥',v:'248',l:'Siswa',s:'T.A. berjalan'}].map(s=>`
+            <div class="stat-card bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all border border-gray-100 text-center">
+                <div class="w-12 h-12 mx-auto mb-4 bg-primary-100 rounded-xl flex items-center justify-center text-lg">${s.i}</div>
+                <div class="text-3xl font-black text-primary-600 mb-1">${s.v}</div>
+                <div class="text-sm text-gray-600 font-semibold">${s.l}</div>
+                <p class="text-xs text-gray-400 mt-1">${s.s}</p>
+            </div>`).join('')}
+        </div>
+    </div>
+</div>
+
+<!-- Lab Section -->
+<div id="lab" class="bg-white py-16 px-6 md:px-8">
+    <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+        <div class="fade-in">
+            <div class="inline-flex items-center gap-2 bg-sky-50 border border-sky-200 rounded-full px-4 py-2 text-sky-700 text-sm font-medium mb-4"><i data-lucide="flask-conical" class="w-4 h-4"></i>Laboratorium Virtual</div>
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Eksperimen Sains Tanpa Batas</h2>
+            <p class="text-lg text-gray-600 mb-6">Lakukan simulasi eksperimen sains secara interaktif kapan saja dan di mana saja.</p>
+            <button onclick="navigate('login-siswa')" class="px-8 py-3 bg-sky-600 text-white font-semibold rounded-xl hover:bg-sky-700 transition-all inline-flex items-center gap-2"><i data-lucide="play" class="w-4 h-4"></i>Mulai Praktikum</button>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            ${[{i:'🔬',t:'Mikroskop Digital'},{i:'🧪',t:'Tabung Reaksi'},{i:'⚛️',t:'Model Atom'},{i:'🧬',t:'DNA Explorer'}].map(item=>`
+            <div class="bg-gradient-to-br from-sky-50 to-sky-100 rounded-2xl p-8 flex flex-col items-center justify-center text-center border border-sky-200 hover:shadow-lg transition-all hover:scale-105">
+                <div class="text-5xl mb-3">${item.i}</div>
+                <div class="text-sm font-semibold text-gray-700">${item.t}</div>
+            </div>`).join('')}
+        </div>
+    </div>
+</div>
+
+<!-- Proyek Section -->
+<div id="proyek" class="bg-gray-50 py-16 px-6 md:px-8">
+    <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+        <div class="grid grid-cols-2 gap-4 md:order-2">
+            ${[{i:'🌱',t:'Keberlanjutan'},{i:'♻️',t:'Daur Ulang'},{i:'💧',t:'Konservasi Air'},{i:'🌳',t:'Reboisasi'}].map(item=>`
+            <div class="bg-gradient-to-br from-accent-50 to-accent-100 rounded-2xl p-8 flex flex-col items-center justify-center text-center border border-accent-200 hover:shadow-lg transition-all hover:scale-105">
+                <div class="text-5xl mb-3">${item.i}</div>
+                <div class="text-sm font-semibold text-gray-700">${item.t}</div>
+            </div>`).join('')}
+        </div>
+        <div class="md:order-1 fade-in">
+            <div class="inline-flex items-center gap-2 bg-accent-50 border border-accent-200 rounded-full px-4 py-2 text-accent-700 text-sm font-medium mb-4"><i data-lucide="globe" class="w-4 h-4"></i>Proyek IPAS</div>
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Belajar Melalui Proyek Nyata</h2>
+            <p class="text-lg text-gray-600 mb-6">Belajar melalui penyelidikan, observasi, dan pemecahan masalah nyata di lingkungan sekitar.</p>
+            <button onclick="navigate('login-siswa')" class="px-8 py-3 bg-accent-600 text-white font-semibold rounded-xl hover:bg-accent-700 transition-all inline-flex items-center gap-2"><i data-lucide="arrow-right" class="w-4 h-4"></i>Lihat Proyek</button>
+        </div>
+    </div>
+</div>
+
+<!-- Testimonial -->
+<div class="bg-white py-16 px-6 md:px-8 border-t border-gray-100">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-14">
+            <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">Apa Kata Siswa?</h2>
+            <p class="text-base text-gray-600 max-w-2xl mx-auto">Pengalaman belajar autentik dari siswa platform IPAS X-plore</p>
+        </div>
+        <div class="grid md:grid-cols-3 gap-6">
+            ${[
+                {name:'Aisyah Rahmawati',cls:'X-A',init:'AR',msg:'"Belajar IPAS jadi lebih menyenangkan dan mudah dipahami dengan visualisasi interaktif."',color:'from-primary-400 to-primary-600',bg:'from-primary-50 to-primary-100/20'},
+                {name:'Budi Pratama',cls:'X-B',init:'BP',msg:'"Praktikum virtual sangat membantu memahami konsep yang sulit tanpa takut membuat kesalahan."',color:'from-sky-400 to-sky-600',bg:'from-sky-50 to-sky-100/20'},
+                {name:'Citra Wijaya',cls:'X-C',init:'CW',msg:'"Proyek IPAS membuat pembelajaran jauh lebih bermakna karena terhubung dengan kehidupan nyata."',color:'from-accent-400 to-accent-600',bg:'from-accent-50 to-accent-100/20'}
+            ].map(t=>`
+            <div class="testimonial-card bg-gradient-to-br ${t.bg} rounded-2xl p-7 border border-gray-200/50 shadow-sm">
+                <div class="flex items-center gap-1 mb-4">${'<i data-lucide="star" class="w-5 h-5 fill-amber-400 text-amber-400"></i>'.repeat(5)}</div>
+                <p class="text-gray-700 leading-relaxed mb-6 text-sm font-medium">${t.msg}</p>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br ${t.color} rounded-full flex items-center justify-center text-white font-bold text-sm">${t.init}</div>
+                    <div><p class="text-sm font-semibold text-gray-800">${t.name}</p><p class="text-xs text-gray-500">Siswa Kelas ${t.cls}</p></div>
+                </div>
+            </div>`).join('')}
+        </div>
+    </div>
+</div>
+
+<!-- Tentang -->
+<div id="tentang" class="bg-white py-16 px-6 md:px-8">
+    <div class="max-w-7xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-black text-gray-900 text-center mb-4">Tentang Pengelola</h2>
+        <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">Platform IPAS X-plore dikembangkan untuk mendukung pembelajaran IPAS yang interaktif dan berpusat pada peserta didik.</p>
+        <div class="max-w-3xl mx-auto bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-lg">
+            <div class="p-8 md:p-12">
+                <h3 class="text-2xl md:text-3xl font-bold text-gray-900 mb-1" id="about-name">${cfg.about_name || defaultConfig.about_name}</h3>
+                <p class="text-primary-600 font-bold text-lg mb-4" id="about-position">${cfg.about_position || defaultConfig.about_position}</p>
+                <p class="text-gray-700 leading-relaxed mb-6 text-sm">IPAS X-plore dikembangkan sebagai media pembelajaran digital untuk mendukung pengalaman belajar yang lebih interaktif, bermakna, dan sesuai dengan kebutuhan peserta didik abad ke-21.</p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="inline-block px-3.5 py-1.5 bg-primary-100 text-primary-700 text-xs font-semibold rounded-full">💡 Inovasi</span>
+                    <span class="inline-block px-3.5 py-1.5 bg-accent-100 text-accent-700 text-xs font-semibold rounded-full">🌱 Berkelanjutan</span>
+                    <span class="inline-block px-3.5 py-1.5 bg-sky-100 text-sky-700 text-xs font-semibold rounded-full">🤝 Kolaboratif</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-gray-300 py-16 px-6 md:px-8">
+    <div class="max-w-7xl mx-auto">
+        <div class="grid md:grid-cols-4 gap-10 mb-12">
+            <div>
+                <div class="flex items-center gap-2 mb-5">
+                    <div class="w-12 h-12 bg-gradient-to-br from-primary-600 to-accent-500 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg">X</div>
+                    <div><div class="font-bold text-white text-base">IPAS X-plore</div><div class="text-xs text-gray-400">Explore • Learn • Discover</div></div>
+                </div>
+                <p class="text-sm text-gray-400 leading-relaxed">Platform pembelajaran digital modern untuk eksplorasi sains, teknologi, lingkungan, dan masyarakat.</p>
+            </div>
+            <div>
+                <h4 class="font-bold text-white mb-5 text-sm uppercase tracking-wide">Menu</h4>
+                <ul class="space-y-3 text-sm">
+                    <li><a href="#" class="text-gray-400 hover:text-primary-400 transition">Beranda</a></li>
+                    <li><a href="#fitur" class="text-gray-400 hover:text-primary-400 transition">Materi</a></li>
+                    <li><a href="#lab" class="text-gray-400 hover:text-primary-400 transition">Praktikum</a></li>
+                    <li><a href="#proyek" class="text-gray-400 hover:text-primary-400 transition">Proyek</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-white mb-5 text-sm uppercase tracking-wide">Hubungi Kami</h4>
+                <ul class="space-y-3 text-sm">
+                    <li class="flex items-center gap-2 text-gray-400"><i data-lucide="mail" class="w-4 h-4"></i>yuliiick@gmail.com</li>
+                    <li class="flex items-center gap-2 text-gray-400"><i data-lucide="phone" class="w-4 h-4"></i>+62 852-524-193 19</li>
+                    <li class="flex items-center gap-2 text-gray-400"><i data-lucide="map-pin" class="w-4 h-4"></i>SMK Negeri 1 Sanggau</li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-white mb-5 text-sm uppercase tracking-wide">Terhubung</h4>
+                <div class="flex gap-3">
+                    <a href="#" class="w-11 h-11 bg-gray-800 hover:bg-primary-600 rounded-lg flex items-center justify-center transition"><i data-lucide="youtube" class="w-5 h-5"></i></a>
+                    <a href="#" class="w-11 h-11 bg-gray-800 hover:bg-pink-600 rounded-lg flex items-center justify-center transition"><i data-lucide="instagram" class="w-5 h-5"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="border-t border-gray-800 pt-10">
+            <p class="text-sm text-gray-400 text-center">© 2026 IPAS X-plore | Dikembangkan oleh ${cfg.about_name || defaultConfig.about_name}</p>
+        </div>
+    </div>
+</footer>
+</div>`;
+}
+
+// =======================
+// LOGIN PAGE
+// =======================
+function renderLogin() {
+    return `
+<div class="min-h-full w-full bg-gradient-to-br from-primary-50 to-sky-50 flex items-center justify-center p-6">
+    <div class="w-full max-w-md fade-in">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-primary-600 rounded-2xl flex items-center justify-center text-white font-bold text-2xl mx-auto mb-4">X</div>
+            <h1 class="text-2xl font-bold text-gray-800">Akses Platform</h1>
+            <p class="text-gray-500 text-sm">Masuk sebagai Guru atau Siswa</p>
+        </div>
+        <div class="bg-white rounded-3xl shadow-xl p-8">
+            <label for="nama-user" class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
+            <input id="nama-user" type="text" placeholder="Masukkan nama Anda" class="w-full px-4 py-3 rounded-xl border border-gray-200 mb-4 focus:outline-none focus:ring-2 focus:ring-primary-300">
+            <label for="nomor-user" class="block text-sm font-medium text-gray-700 mb-2">NIP / Nomor Absen</label>
+            <input id="nomor-user" type="text" placeholder="Masukkan NIP atau nomor absen" class="w-full px-4 py-3 rounded-xl border border-gray-200 mb-4 focus:outline-none focus:ring-2 focus:ring-primary-300">
+            <label for="peran-user" class="block text-sm font-medium text-gray-700 mb-2">Peran Anda</label>
+            <select id="peran-user" class="w-full px-4 py-3 rounded-xl border border-gray-200 mb-6 focus:outline-none focus:ring-2 focus:ring-primary-300">
+                <option value="">-- Pilih Peran --</option>
+                <option value="guru">Guru</option>
+                <option value="siswa">Siswa</option>
+            </select>
+            <button onclick="loginUser()" class="w-full py-3 bg-primary-600 text-white font-semibold rounded-xl hover:bg-primary-700 transition">Masuk</button>
+        </div>
+        <button onclick="navigate('landing')" class="mt-4 text-sm text-primary-600 hover:underline block mx-auto">← Kembali ke Beranda</button>
+    </div>
+</div>`;
+}
+
+// =======================
+// LAYOUTS
+// =======================
+function guruLayout(content, active) {
+    const items = [
+        {icon:'bar-chart-2',label:'Dashboard',page:'dashboard-guru'},
+        {icon:'book-open',label:'Materi',page:'materi-guru'},
+        {icon:'flask-conical',label:'Lab Virtual',page:'lab-guru'},
+        {icon:'globe',label:'Proyek',page:'proyek-guru'},
+        {icon:'file-question',label:'Bank Soal',page:'bank-soal'},
+        {icon:'check-circle',label:'Penilaian',page:'penilaian'},
+        {icon:'trending-up',label:'Statistik',page:'statistik'},
+        {icon:'trophy',label:'Ranking',page:'ranking-guru'}
+    ];
+    return `
+<div class="flex h-full w-full bg-gray-50">
+    <aside class="hidden md:flex flex-col w-64 bg-white border-r border-gray-100 p-4 shrink-0">
+        <div class="flex items-center gap-2 mb-8 px-2">
+            <div class="w-9 h-9 bg-primary-600 rounded-xl flex items-center justify-center text-white font-bold text-sm">X</div>
+            <span class="font-bold text-gray-800">IPAS X-plore</span>
+        </div>
+        <nav class="flex-1 space-y-1">
+            ${items.map(item=>`<button onclick="navigate('${item.page}')" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${active===item.page?'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-md':'text-gray-700 hover:bg-primary-50'}"><i data-lucide="${item.icon}" class="w-5 h-5"></i>${item.label}</button>`).join('')}
+        </nav>
+        <button onclick="userRole=null;navigate('landing')" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-500 mt-4"><i data-lucide="log-out" class="w-5 h-5"></i>Logout</button>
+    </aside>
+    <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t z-50 flex justify-around py-2">
+        ${items.slice(0,5).map(item=>`<button onclick="navigate('${item.page}')" class="flex flex-col items-center text-xs ${active===item.page?'text-primary-600':'text-gray-400'}"><i data-lucide="${item.icon}" class="w-5 h-5"></i><span>${item.label}</span></button>`).join('')}
+    </div>
+    <main class="flex-1 overflow-auto p-4 md:p-8 pb-20 md:pb-8 fade-in">${content}</main>
+</div>`;
+}
+
+function siswaLayout(content, active) {
+    const items = [
+        {icon:'home',label:'Beranda',page:'dashboard-siswa'},
+        {icon:'book-open',label:'Materi',page:'materi-siswa'},
+        {icon:'flask-conical',label:'Lab',page:'lab-siswa'},
+        {icon:'globe',label:'Proyek',page:'proyek-siswa'},
+        {icon:'edit',label:'Soal',page:'kerjakan-soal'},
+        {icon:'bar-chart-2',label:'Nilai',page:'nilai-saya'},
+        {icon:'trophy',label:'Ranking',page:'ranking-siswa'},
+        {icon:'user',label:'Profil',page:'profil-saya'}
+    ];
+    return `
+<div class="flex h-full w-full bg-gray-50">
+    <aside class="hidden md:flex flex-col w-64 bg-white border-r border-gray-100 p-4 shrink-0">
+        <div class="flex items-center gap-2 mb-8 px-2">
+            <div class="w-9 h-9 bg-accent-500 rounded-xl flex items-center justify-center text-white font-bold text-sm">X</div>
+            <span class="font-bold text-gray-800">IPAS X-plore</span>
+        </div>
+        <nav class="flex-1 space-y-1">
+            ${items.map(item=>`<button onclick="navigate('${item.page}')" class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${active===item.page?'bg-gradient-to-r from-accent-400 to-accent-500 text-white shadow-md':'text-gray-700 hover:bg-accent-50'}"><i data-lucide="${item.icon}" class="w-5 h-5"></i>${item.label}</button>`).join('')}
+        </nav>
+        <button onclick="userRole=null;navigate('landing')" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-500 mt-4"><i data-lucide="log-out" class="w-5 h-5"></i>Keluar</button>
+    </aside>
+    <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t z-50 flex justify-around py-2">
+        ${items.slice(0,5).map(item=>`<button onclick="navigate('${item.page}')" class="flex flex-col items-center text-xs ${active===item.page?'text-accent-600':'text-gray-400'}"><i data-lucide="${item.icon}" class="w-5 h-5"></i><span>${item.label}</span></button>`).join('')}
+    </div>
+    <main class="flex-1 overflow-auto p-4 md:p-8 pb-20 md:pb-8 fade-in">${content}</main>
+</div>`;
+}
+
+// =======================
+// GURU PAGES
+// =======================
+function renderDashboardGuru() {
+    return guruLayout(`
+    <div class="mb-6"><h1 class="text-2xl font-bold text-gray-800">Dashboard Guru</h1><p class="text-gray-500 text-sm">Selamat datang, ${userName}!</p></div>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        ${[{v:stats.siswa,l:'Siswa',i:'👨‍🎓'},{v:stats.materi,l:'Materi',i:'📚'},{v:stats.praktikum,l:'Praktikum',i:'🧪'},{v:stats.proyek,l:'Proyek',i:'🌍'},{v:stats.soal,l:'Soal',i:'📝'},{v:stats.rataRata,l:'Rata-rata',i:'📈'}].map(s=>`
+        <div class="bg-white rounded-2xl p-4 shadow-sm card-hover"><div class="text-2xl mb-2">${s.i}</div><div class="text-2xl font-bold text-gray-800">${s.v}</div><div class="text-xs text-gray-500">${s.l}</div></div>`).join('')}
+    </div>
+    <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-white rounded-2xl p-6 shadow-sm">
+            <h3 class="font-semibold text-gray-800 mb-4">📈 Perkembangan Nilai</h3>
+            <div class="h-48 flex items-end gap-2 justify-around">
+                ${[65,72,68,78,82,85,80,88].map((v,i)=>`<div class="flex flex-col items-center gap-1 flex-1"><span class="text-xs text-gray-500">${v}</span><div class="w-full bg-gradient-to-t from-primary-500 to-primary-300 rounded-t-lg" style="height:${v}%"></div><span class="text-xs text-gray-400">M${i+1}</span></div>`).join('')}
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl p-6 shadow-sm">
+            <h3 class="font-semibold text-gray-800 mb-4">✅ Ketuntasan Belajar</h3>
+            <div class="flex items-center justify-center h-48">
+                <div class="relative w-40 h-40">
+                    <svg class="w-full h-full" viewBox="0 0 36 36"><path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e5e7eb" stroke-width="3"/><path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#8b5cf6" stroke-width="3" stroke-dasharray="78, 100" stroke-linecap="round"/></svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center"><span class="text-3xl font-bold text-primary-600">78%</span><span class="text-xs text-gray-500">Tuntas</span></div>
+                </div>
+            </div>
+        </div>
+    </div>`, 'dashboard-guru');
+}
+
+function renderMateriGuru() {
+    return guruLayout(`
+    <div class="flex items-center justify-between mb-6">
+        <div><h1 class="text-2xl font-bold text-gray-800">📚 Materi Pembelajaran</h1><p class="text-gray-500 text-sm">Kelola materi IPAS kelas X</p></div>
+    </div>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        ${materiList.map(m=>`
+        <div class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover">
+            <div class="h-32 bg-gradient-to-br from-primary-400 to-sky-400 flex items-center justify-center text-5xl">${m.icon}</div>
+            <div class="p-5">
+                <h3 class="font-semibold text-gray-800 mb-1">${m.title}</h3>
+                <p class="text-sm text-gray-500 mb-3">${m.desc}</p>
+                <button onclick="currentMateri=${m.id};navigate('materi-detail')" class="w-full py-2 bg-primary-600 text-white rounded-lg text-xs font-medium hover:bg-primary-700">📖 Belajar</button>
+            </div>
+        </div>`).join('')}
+    </div>`, 'materi-guru');
+}
+
+function renderLabGuru() {
+    return guruLayout(`
+    <div class="mb-6"><h1 class="text-2xl font-bold text-gray-800">🧪 Laboratorium Virtual</h1></div>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        ${labList.map(l=>`
+        <div class="bg-white rounded-2xl shadow-sm p-5 card-hover">
+            <div class="text-xs font-medium text-primary-600 bg-primary-50 rounded-full px-3 py-1 inline-block mb-3">${l.cat}</div>
+            <h3 class="font-semibold text-gray-800 mb-2">${l.title}</h3>
+            <p class="text-sm text-gray-500 mb-4">${l.desc}</p>
+            <button class="w-full py-2 bg-primary-600 text-white rounded-lg text-xs font-medium hover:bg-primary-700">▶ Mulai Simulasi</button>
+        </div>`).join('')}
+    </div>`, 'lab-guru');
+}
+
+function renderProyekGuru() {
+    return guruLayout(`
+    <div class="mb-6"><h1 class="text-2xl font-bold text-gray-800">🌍 Proyek IPAS</h1></div>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        ${proyekList.map(p=>`
+        <div class="bg-white rounded-2xl shadow-sm p-5 card-hover">
+            <div class="flex items-center justify-between mb-3"><span class="text-3xl">${p.icon}</span><span class="text-xs text-gray-400">⏰ ${p.deadline}</span></div>
+            <h3 class="font-semibold text-gray-800 mb-3">${p.title}</h3>
+            <div class="mb-2 flex justify-between text-xs text-gray-500"><span>Progress</span><span>${p.progress}%</span></div>
+            <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-accent-400 to-accent-500 rounded-full progress-bar" style="width:${p.progress}%"></div></div>
+        </div>`).join('')}
+    </div>`, 'proyek-guru');
+}
+
+function renderBankSoal() {
+    return guruLayout(`
+    <div class="mb-6"><h1 class="text-2xl font-bold text-gray-800">📝 Bank Soal</h1></div>
+    <div class="space-y-3">
+        ${soalList.map((s,i)=>`
+        <div class="bg-white rounded-2xl shadow-sm p-5 card-hover">
+            <div class="flex gap-2 mb-2">
+                <span class="text-xs bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full">${s.type}</span>
+                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">${s.materi}</span>
+            </div>
+            <p class="text-gray-800 font-medium text-sm">${s.soal}</p>
+        </div>`).join('')}
+    </div>`, 'bank-soal');
+}
+
+function renderPenilaian() {
+    return guruLayout(`
+    <div class="mb-6"><h1 class="text-2xl font-bold text-gray-800">✅ Penilaian</h1></div>
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50"><tr><th class="px-5 py-3 text-left text-xs font-semibold text-gray-500">No</th><th class="px-5 py-3 text-left text-xs font-semibold text-gray-500">Nama</th><th class="px-5 py-3 text-left text-xs font-semibold text-gray-500">Kelas</th><th class="px-5 py-3 text-left text-xs font-semibold text-gray-500">Nilai</th><th class="px-5 py-3 text-left text-xs font-semibold text-gray-500">Status</th></tr></thead>
+                <tbody>${siswaList.map((s,i)=>`<tr class="border-t border-gray-50 hover:bg-gray-50"><td class="px-5 py-3 text-sm text-gray-500">${i+1}</td><td class="px-5 py-3 text-sm font-medium text-gray-800">${s.nama}</td><td class="px-5 py-3 text-sm text-gray-500">${s.kelas}</td><td class="px-5 py-3 text-sm font-semibold ${s.nilai>=75?'text-accent-600':'text-red-500'}">${s.nilai}</td><td class="px-5 py-3"><span class="text-xs px-2 py-1 rounded-full ${s.nilai>=75?'bg-accent-100 text-accent-700':'bg-red-100 text-red-600'}">${s.nilai>=75?'Tuntas':'Belum Tuntas'}</span></td></tr>`).join('')}</tbody>
+            </table>
+        </div>
+    </div>`, 'penilaian');
+}
+
+function renderStatistik() {
+    return guruLayout(`
+    <div class="mb-6"><h1 class="text-2xl font-bold text-gray-800">📈 Statistik</h1></div>
+    <div class="grid md:grid-cols-4 gap-4 mb-6">
+        ${[{l:'Tertinggi',v:'95',c:'text-accent-600'},{l:'Terendah',v:'78',c:'text-red-500'},{l:'Rata-rata',v:'78.5',c:'text-primary-600'},{l:'Ketuntasan',v:'78%',c:'text-sky-600'}].map(s=>`
+        <div class="bg-white rounded-2xl p-5 shadow-sm text-center card-hover"><div class="text-2xl font-bold ${s.c}">${s.v}</div><div class="text-xs text-gray-500">${s.l}</div></div>`).join('')}
+    </div>
+    <div class="bg-white rounded-2xl p-6 shadow-sm">
+        <h3 class="font-semibold text-gray-800 mb-4">Distribusi Nilai</h3>
+        <div class="space-y-3">
+            ${[{r:'90-100',p:25,c:'bg-accent-400'},{r:'80-89',p:35,c:'bg-primary-400'},{r:'70-79',p:25,c:'bg-sky-400'},{r:'<70',p:15,c:'bg-red-400'}].map(d=>`
+            <div class="flex items-center gap-3"><span class="text-xs text-gray-500 w-12">${d.r}</span><div class="flex-1 h-6 bg-gray-100 rounded-full overflow-hidden"><div class="${d.c} h-full rounded-full progress-bar" style="width:${d.p}%"></div></div><span class="text-xs font-medium text-gray-600 w-8">${d.p}%</span></div>`).join('')}
+        </div>
+    </div>`, 'statistik');
+}
+
+function renderRanking() {
+    const sorted = [...siswaList].sort((a,b)=>b.nilai-a.nilai);
+    return guruLayout(`
+    <div class="mb-6"><h1 class="text-2xl font-bold text-gray-800">🏆 Ranking Siswa</h1></div>
+    <div class="flex items-end justify-center gap-4 mb-8 h-52">
+        <div class="flex flex-col items-center"><div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center text-2xl mb-2">🥈</div><div class="bg-gradient-to-t from-gray-300 to-gray-200 w-24 rounded-t-xl flex flex-col items-center justify-end pb-3" style="height:120px"><span class="text-xs font-bold">${sorted[1].nama.split(' ')[0]}</span><span class="text-lg font-bold">${sorted[1].nilai}</span></div></div>
+        <div class="flex flex-col items-center"><div class="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center text-3xl mb-2">🥇</div><div class="bg-gradient-to-t from-yellow-400 to-yellow-300 w-28 rounded-t-xl flex flex-col items-center justify-end pb-3" style="height:160px"><span class="text-xs font-bold">${sorted[0].nama.split(' ')[0]}</span><span class="text-2xl font-bold">${sorted[0].nilai}</span></div></div>
+        <div class="flex flex-col items-center"><div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center text-2xl mb-2">🥉</div><div class="bg-gradient-to-t from-orange-300 to-orange-200 w-24 rounded-t-xl flex flex-col items-center justify-end pb-3" style="height:100px"><span class="text-xs font-bold">${sorted[2].nama.split(' ')[0]}</span><span class="text-lg font-bold">${sorted[2].nilai}</span></div></div>
+    </div>
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <table class="w-full"><thead class="bg-gray-50"><tr><th class="px-5 py-3 text-left text-xs font-semibold text-gray-500">#</th><th class="px-5 py-3 text-left text-xs font-semibold text-gray-500">Nama</th><th class="px-5 py-3 text-left text-xs font-semibold text-gray-500">Kelas</th><th class="px-5 py-3 text-left text-xs font-semibold text-gray-500">Nilai</th></tr></thead>
+        <tbody>${sorted.map((s,i)=>`<tr class="border-t border-gray-50 hover:bg-gray-50"><td class="px-5 py-3 text-sm font-bold ${i<3?'text-primary-600':'text-gray-500'}">${i+1}</td><td class="px-5 py-3 text-sm font-medium text-gray-800">${s.nama}</td><td class="px-5 py-3 text-sm text-gray-500">${s.kelas}</td><td class="px-5 py-3 text-sm font-semibold text-primary-600">${s.nilai}</td></tr>`).join('')}</tbody></table>
+    </div>`, 'ranking-guru');
+}
+
+// =======================
+// SISWA PAGES
+// =======================
+function renderDashboardSiswa() {
+    return siswaLayout(`
+    <div class="mb-6"><h1 class="text-2xl font-bold text-gray-800">Halo, ${userName}! 👋</h1><p class="text-gray-500 text-sm">Selamat belajar hari ini!</p></div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        ${[{v:'4/4',l:'Materi Selesai',i:'📚',c:'bg-primary-50'},{v:'3/4',l:'Lab Selesai',i:'🧪',c:'bg-sky-50'},{v:'85',l:'Nilai Rata-rata',i:'📊',c:'bg-accent-50'},{v:'#3',l:'Peringkat',i:'🏆',c:'bg-yellow-50'}].map(s=>`
+        <div class="${s.c} rounded-2xl p-4 card-hover"><div class="text-2xl mb-2">${s.i}</div><div class="text-xl font-bold text-gray-800">${s.v}</div><div class="text-xs text-gray-500">${s.l}</div></div>`).join('')}
+    </div>
+    <h2 class="font-semibold text-gray-800 mb-3">Aksi Cepat</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+        <button onclick="navigate('materi-siswa')" class="bg-white rounded-xl p-4 shadow-sm card-hover text-center"><div class="text-2xl mb-1">📖</div><div class="text-xs font-medium text-gray-600">Belajar Materi</div></button>
+        <button onclick="navigate('lab-siswa')" class="bg-white rounded-xl p-4 shadow-sm card-hover text-center"><div class="text-2xl mb-1">🔬</div><div class="text-xs font-medium text-gray-600">Lab Virtual</div></button>
+        <button onclick="navigate('kerjakan-soal')" class="bg-white rounded-xl p-4 shadow-sm card-hover text-center"><div class="text-2xl mb-1">📝</div><div class="text-xs font-medium text-gray-600">Kerjakan Soal</div></button>
+        <button onclick="navigate('proyek-siswa')" class="bg-white rounded-xl p-4 shadow-sm card-hover text-center"><div class="text-2xl mb-1">🌍</div><div class="text-xs font-medium text-gray-600">Proyek IPAS</div></button>
+    </div>
+    <div class="bg-white rounded-2xl p-5 shadow-sm">
+        <h3 class="font-semibold text-gray-800 mb-3">📢 Pengumuman</h3>
+        <div class="space-y-3">
+            <div class="flex items-start gap-3 p-3 bg-primary-50 rounded-xl"><span class="text-lg">📋</span><div><p class="text-sm font-medium text-gray-800">Ujian Tengah Semester</p><p class="text-xs text-gray-500">Jadwal UTS dimulai tanggal 15 Maret 2025</p></div></div>
+            <div class="flex items-start gap-3 p-3 bg-accent-50 rounded-xl"><span class="text-lg">🏅</span><div><p class="text-sm font-medium text-gray-800">Badge Baru!</p><p class="text-xs text-gray-500">Kamu mendapatkan badge "Eksplorator Sains"</p></div></div>
+        </div>
+    </div>`, 'dashboard-siswa');
+}
+
+function renderMateriSiswa() {
+    return siswaLayout(`
+    <div class="mb-6"><h1 class="text-2xl font-bold text-gray-800">📚 Materi Pembelajaran</h1></div>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        ${materiList.map(m=>`
+        <div class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover">
+            <div class="h-28 bg-gradient-to-br from-primary-400 to-sky-400 flex items-center justify-center text-4xl">${m.icon}</div>
+            <div class="p-4">
+                <h3 class="font-semibold text-gray-800 text-sm mb-1">${m.title}</h3>
+                <p class="text-xs text-gray-500 mb-3">${m.desc}</p>
+                <div class="flex justify-between text-xs text-gray-400 mb-1"><span>Progress</span><span>${m.progress}%</span></div>
+                <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden mb-3"><div class="h-full bg-accent-400 rounded-full progress-bar" style="width:${m.progress}%"></div></div>
+                <button onclick="currentMateri=${m.id};navigate('materi-detail')" class="w-full py-2 bg-primary-600 text-white rounded-lg text-xs font-medium hover:bg-primary-700">📖 Belajar</button>
+            </div>
+        </div>`).join('')}
+    </div>`, 'materi-siswa');
+}
+
+function renderMateriDetail() {
+    const materiContent = {
+        1: { title:'🧬 Ciri-Ciri Makhluk Hidup', sections: [
+            {id:'intro',icon:'🧬',title:'Pengantar',content:'Makhluk hidup adalah segala sesuatu yang memiliki kehidupan dan melakukan berbagai aktivitas biologis.',illustrations:['👤 Manusia','🐱 Kucing','🌳 Pohon','🍄 Jamur','🦠 Bakteri']},
+            {id:'respirasi',icon:'🫁',title:'1. Bernapas (Respirasi)',desc:'Semua makhluk hidup melakukan respirasi untuk energi',examples:['Manusia: paru-paru','Ikan: insang','Serangga: trakea','Tumbuhan: stomata'],fact:'💡 Tumbuhan juga bernapas sepanjang waktu.',quiz:{q:'Apa fungsi utama respirasi?',opts:['Memperoleh energi','Menghasilkan makanan','Berkembang biak','Bergerak'],ans:0}},
+            {id:'makanan',icon:'🍎',title:'2. Memerlukan Makanan',desc:'Semua makhluk hidup membutuhkan energi',examples:['Manusia: dari makanan','Hewan: dari tumbuhan/hewan lain','Tumbuhan: fotosintesis'],fact:'💡 Fotosintesis: Cahaya + Air + CO₂ → Glukosa + O₂',quiz:{q:'Siapa yang membuat makanan sendiri?',opts:['Manusia','Hewan','Tumbuhan','Bakteri'],ans:2}},
+            {id:'gerak',icon:'🚀',title:'3. Bergerak',desc:'Semua makhluk hidup dapat bergerak',examples:['Burung terbang','Ikan berenang','Bunga matahari mengikuti cahaya'],fact:'💡 Gerakan tumbuhan bisa sangat lambat.',quiz:{q:'Gerak bunga matahari disebut...',opts:['Fototropisme','Geotropisme','Hidrotropisme','Tigmotropisme'],ans:0}},
+            {id:'tumbuh',icon:'📈',title:'4. Tumbuh dan Berkembang',desc:'Pertumbuhan = ukuran, Perkembangan = kedewasaan',examples:['Bayi → Anak → Remaja → Dewasa','Biji → Tunas → Tanaman dewasa'],fact:'💡 Pertumbuhan karena pembelahan sel.',quiz:{q:'Perbedaan pertumbuhan dan perkembangan?',opts:['Tidak ada','Ukuran vs kedewasaan','Perkembangan dulu','Hanya tumbuhan'],ans:1}},
+            {id:'reproduksi',icon:'👶',title:'5. Berkembang Biak',desc:'Mempertahankan kelangsungan jenis',examples:['Ayam bertelur (ovipar)','Kucing melahirkan (vivipar)','Tumbuhan: biji/tunas'],fact:'💡 Reproduksi memastikan spesies tidak punah.',quiz:{q:'Hewan bertelur disebut...',opts:['Vivipar','Ovipar','Ovovivipar','Aseksual'],ans:1}},
+            {id:'rangsang',icon:'⚡',title:'6. Peka Terhadap Rangsangan',desc:'Merespons perubahan lingkungan',examples:['Refleks: tangan dari benda panas','Putri malu menutup daun','Pupil membesar di gelap'],fact:'💡 Respons membantu bertahan hidup.',quiz:{q:'Putri malu merespons rangsangan...',opts:['Cahaya','Sentuhan','Panas','Dingin'],ans:1}},
+            {id:'ekskresi',icon:'💦',title:'7. Ekskresi',desc:'Mengeluarkan zat sisa metabolisme',examples:['Keringat: kulit','Urine: ginjal','CO₂: paru-paru'],fact:'💡 Penumpukan zat sisa berbahaya.',quiz:{q:'Yang BUKAN zat sisa metabolisme?',opts:['Keringat','Urine','Darah','CO₂'],ans:2}},
+            {id:'adaptasi',icon:'🦬',title:'8. Beradaptasi',desc:'Menyesuaikan diri dengan lingkungan',examples:['Kaktus: daun duri','Unta: punuk lemak','Beruang kutub: bulu tebal'],fact:'💡 Adaptasi terbentuk melalui evolusi.',quiz:{q:'Kaktus berdaun duri adalah adaptasi...',opts:['Struktur','Perilaku','Fisiologi','Bukan adaptasi'],ans:0}}
+        ]},
+        2: { title:'🌍 Ekosistem', sections: [
+            {id:'intro',icon:'🌍',title:'Pengantar Ekosistem',content:'Ekosistem adalah sistem makhluk hidup dan lingkungan fisik yang saling berinteraksi.',illustrations:['🌲 Hutan','🌊 Laut','🏜️ Gurun','💧 Sungai','🌾 Padang']},
+            {id:'biotik',icon:'🦁',title:'1. Komponen Biotik',desc:'Makhluk hidup dalam ekosistem',examples:['Produsen: tumbuhan hijau','Konsumen: hewan','Pengurai: bakteri, jamur'],fact:'💡 Ketiga jenis organisme ini menjaga keseimbangan.',quiz:{q:'Peran produsen dalam ekosistem?',opts:['Memakan konsumen','Membuat makanan dari matahari','Mengurai bahan organik','Memakan pengurai'],ans:1}},
+            {id:'abiotik',icon:'☀️',title:'2. Komponen Abiotik',desc:'Faktor fisik yang mempengaruhi makhluk hidup',examples:['Cahaya matahari','Air','Tanah','Udara dan suhu'],fact:'💡 Komponen abiotik menentukan jenis organisme yang bisa hidup.',quiz:{q:'Sumber energi utama ekosistem?',opts:['Matahari','Air','Tanah','Udara'],ans:0}},
+            {id:'rantai',icon:'🔗',title:'3. Rantai Makanan',desc:'Urutan pemindahan energi antar organisme',examples:['Rumput → Belalang → Ayam → Manusia','Alga → Ikan kecil → Ikan besar'],fact:'💡 Setiap rantai dimulai dari produsen.',quiz:{q:'Awal rantai makanan selalu?',opts:['Hewan herbivora','Tumbuhan hijau','Bakteri','Jamur'],ans:1}},
+            {id:'keseimbangan',icon:'⚖️',title:'4. Keseimbangan Ekosistem',desc:'Kondisi harmonis semua komponen',examples:['Populasi predator-mangsa seimbang','Nutrisi tanah mencukupi','Tidak ada pencemaran berlebihan'],fact:'💡 Keseimbangan dapat terganggu oleh alam atau manusia.',quiz:{q:'Tanda ekosistem seimbang?',opts:['Banyak limbah','Keanekaragaman tinggi','Satu jenis saja','Tidak ada pengurai'],ans:1}}
+        ]},
+        3: { title:'🤝 Interaksi Dalam Ekosistem', sections: [
+            {id:'intro',icon:'🤝',title:'Pengantar',content:'Interaksi dalam ekosistem meliputi hubungan antar makhluk hidup yang saling mempengaruhi.',illustrations:['🦁 Predator','🦌 Mangsa','🌺 Simbiosis','🐜 Kompetisi','🦠 Parasit']},
+            {id:'simbiosis',icon:'🤝',title:'1. Simbiosis',desc:'Hubungan erat dua spesies berbeda',examples:['Mutualisme: lebah dan bunga','Parasitisme: kutu dan anjing','Komensalisme: ikan remora dan hiu'],fact:'💡 Simbiosis mutualisme saling menguntungkan.',quiz:{q:'Hubungan lebah-bunga adalah...',opts:['Parasitisme','Mutualisme','Komensalisme','Kompetisi'],ans:1}},
+            {id:'predasi',icon:'🦁',title:'2. Predasi',desc:'Hubungan pemangsa dan mangsa',examples:['Singa memangsa rusa','Elang memangsa tikus','Ular memangsa katak'],fact:'💡 Predasi mengontrol populasi mangsa.',quiz:{q:'Predasi berfungsi untuk...',opts:['Menghancurkan ekosistem','Mengontrol populasi','Membunuh semua mangsa','Tidak ada fungsi'],ans:1}}
+        ]},
+        4: { title:'🌱 Pencemaran dan Pelestarian', sections: [
+            {id:'intro',icon:'🌱',title:'Pengantar',content:'Pencemaran lingkungan dan upaya pelestarian merupakan tantangan penting bagi keseimbangan ekosistem.',illustrations:['🏭 Polusi','🌊 Pencemaran Air','🌬️ Polusi Udara','♻️ Daur Ulang','🌳 Reboisasi']},
+            {id:'pencemaran',icon:'🏭',title:'1. Jenis Pencemaran',desc:'Pencemaran dapat terjadi di air, udara, dan tanah',examples:['Pencemaran air: limbah pabrik','Pencemaran udara: asap kendaraan','Pencemaran tanah: pestisida'],fact:'💡 Pencemaran menurunkan kualitas lingkungan hidup.',quiz:{q:'Penyebab pencemaran air?',opts:['Reboisasi','Limbah pabrik','Daur ulang','Penghijauan'],ans:1}},
+            {id:'pelestarian',icon:'🌳',title:'2. Upaya Pelestarian',desc:'Langkah menjaga kelestarian lingkungan',examples:['Reboisasi: menanam kembali hutan','Reduce, Reuse, Recycle','Taman nasional dan cagar alam'],fact:'💡 Setiap individu dapat berkontribusi pada pelestarian.',quiz:{q:'3R dalam pelestarian adalah...',opts:['Read, Run, Rest','Reduce, Reuse, Recycle','Red, Rose, Rain','React, Repeat, Return'],ans:1}}
+        ]}
+    };
+
+    const content = materiContent[currentMateri] || materiContent[1];
+    return `
+<div class="w-full bg-gray-50 pb-8">
+    <div class="bg-gradient-to-r from-primary-600 to-sky-500 text-white p-6 md:p-8">
+        <button onclick="navigate('materi-siswa')" class="flex items-center gap-2 mb-4 hover:opacity-80 text-sm font-medium"><i data-lucide="chevron-left" class="w-4 h-4"></i>Kembali</button>
+        <h1 class="text-3xl font-bold mb-2">${content.title}</h1>
+        <p class="text-white/80">Pelajari materi secara lengkap dan interaktif</p>
+    </div>
+    <div class="max-w-4xl mx-auto px-4 md:px-6 py-8">
+        ${content.sections.map((s,idx)=>`
+        <div id="${s.id}" class="bg-white rounded-2xl shadow-sm p-6 md:p-8 mb-6 fade-in">
+            <div class="flex items-start gap-3 mb-4">
+                <span class="text-4xl">${s.icon}</span>
+                <div><h2 class="text-xl font-bold text-gray-800">${s.title}</h2>${s.desc?`<p class="text-gray-500 text-sm">${s.desc}</p>`:''}</div>
+            </div>
+            ${s.content ? `
+                <p class="text-gray-700 mb-4">${s.content}</p>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-3">${s.illustrations.map(ill=>`<div class="text-center p-3 bg-gradient-to-br from-primary-100 to-sky-100 rounded-xl"><p class="text-sm font-medium text-gray-700">${ill}</p></div>`).join('')}</div>
+            ` : `
+                <div class="space-y-4">
+                    <div><h3 class="font-semibold text-gray-800 mb-2 text-sm">📌 Penjelasan:</h3>
+                        <ul class="space-y-2">${s.examples.map(ex=>`<li class="flex gap-2 p-2 bg-gray-50 rounded-lg text-sm text-gray-700"><span class="text-primary-600">✓</span>${ex}</li>`).join('')}</ul>
+                    </div>
+                    <div class="p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg"><p class="text-sm text-gray-800">${s.fact}</p></div>
+                    ${s.quiz ? `
+                    <div class="p-4 bg-blue-50 rounded-xl">
+                        <h4 class="font-semibold text-gray-800 mb-3 text-sm">🧠 Cek Pemahaman:</h4>
+                        <p class="text-sm text-gray-700 mb-3 font-medium">${s.quiz.q}</p>
+                        <div class="space-y-2" id="quiz-${s.id}">${s.quiz.opts.map((opt,i)=>`<label class="flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-white transition"><input type="radio" name="quiz-${s.id}" value="${i}" class="accent-primary-600"><span class="text-sm text-gray-700">${opt}</span></label>`).join('')}</div>
+                        <button onclick="checkSectionQuiz('${s.id}',${s.quiz.ans})" class="mt-3 px-4 py-2 bg-primary-600 text-white rounded-lg text-xs font-medium hover:bg-primary-700 w-full">Cek Jawaban</button>
+                        <div id="result-${s.id}" class="mt-2 text-sm hidden"></div>
+                    </div>` : ''}
+                </div>
+            `}
+        </div>`).join('')}
+        <div class="flex gap-3">
+            <button onclick="navigate('materi-siswa')" class="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition text-center">← Kembali</button>
+            <button onclick="navigate('kerjakan-soal')" class="flex-1 px-4 py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition text-center">Ujian Materi →</button>
+        </div>
+    </div>
+</div>`;
+}
+
+function checkSectionQuiz(sectionId, correctAnswer) {
+    const selected = document.querySelector(`input[name="quiz-${sectionId}"]:checked`);
+    const resultDiv = document.getElementById(`result-${sectionId}`);
+    if (!selected) { resultDiv.textContent = '❌ Pilih jawaban!'; resultDiv.className = 'mt-2 text-sm text-red-600'; return; }
+    const isCorrect = parseInt(selected.value) === correctAnswer;
+    resultDiv.textContent = isCorrect ? '✅ Benar! Bagus sekali!' : '❌ Belum benar, coba lagi!';
+    resultDiv.className = `mt-2 text-sm ${isCorrect ? 'text-green-600' : 'text-red-600'}`;
+}
+
+function renderLabSiswa() {
+    return siswaLayout(`
+    <div class="mb-6"><h1 class="text-2xl font-bold text-gray-800">🧪 Laboratorium Virtual</h1></div>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        ${labList.map(l=>`
+        <div class="bg-white rounded-2xl shadow-sm p-5 card-hover">
+            <div class="text-xs font-medium text-accent-600 bg-accent-50 rounded-full px-3 py-1 inline-block mb-3">${l.cat}</div>
+            <h3 class="font-semibold text-gray-800 mb-2 text-sm">${l.title}</h3>
+            <p class="text-xs text-gray-500 mb-4">${l.desc}</p>
+            <button class="w-full py-2 bg-accent-500 text-white rounded-lg text-xs font-medium hover:bg-accent-600">▶ Mulai Eksperimen</button>
+        </div>`).join('')}
+    </div>`, 'lab-siswa');
+}
+
+function renderProyekSiswa() {
+    return siswaLayout(`
+    <div class="mb-6"><h1 class="text-2xl font-bold text-gray-800">🌍 Proyek IPAS</h1></div>
+    <div class="grid md:grid-cols-2 gap-4">
+        ${proyekList.map(p=>`
+        <div class="bg-white rounded-2xl shadow-sm p-5 card-hover">
+            <div class="flex items-center gap-3 mb-3"><span class="text-3xl">${p.icon}</span><div><h3 class="font-semibold text-gray-800 text-sm">${p.title}</h3><span class="text-xs text-gray-400">Deadline: ${p.deadline}</span></div></div>
+            <div class="flex justify-between text-xs text-gray-500 mb-1"><span>Progress</span><span>${p.progress}%</span></div>
+            <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-accent-400 to-accent-500 rounded-full progress-bar" style="width:${p.progress}%"></div></div>
+        </div>`).join('')}
+    </div>`, 'proyek-siswa');
+}
+
+function renderKerjakanSoal() {
+    return siswaLayout(`
+    <div class="flex items-center justify-between mb-6">
+        <div><h1 class="text-2xl font-bold text-gray-800">📝 Kerjakan Soal</h1><p class="text-gray-500 text-sm">Evaluasi pemahaman materi</p></div>
+    </div>
+    ${quizSubmitted ? renderQuizResults() : renderQuizQuestions()}`, 'kerjakan-soal');
+}
+
+function renderQuizQuestions() {
+    return `
+    <div class="space-y-4">
+        ${soalList.map((s,i)=>`
+        <div class="bg-white rounded-2xl shadow-sm p-5">
+            <div class="flex gap-2 mb-3">
+                <span class="w-7 h-7 bg-primary-100 text-primary-700 rounded-full flex items-center justify-center text-xs font-bold">${i+1}</span>
+                <span class="text-xs bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full self-center">${s.type}</span>
+            </div>
+            <p class="text-sm font-medium text-gray-800 mb-3">${s.soal}</p>
+            ${s.options ? `<div class="space-y-2">${s.options.map((o,j)=>`
+                <label class="flex items-center gap-3 p-3 rounded-xl border cursor-pointer hover:bg-gray-50 ${quizAnswers[s.id]===j?'border-primary-400 bg-primary-50':'border-gray-200'}">
+                    <input type="radio" name="q${s.id}" ${quizAnswers[s.id]===j?'checked':''} onchange="quizAnswers[${s.id}]=${j};render()" class="accent-primary-600">
+                    <span class="text-sm text-gray-700">${o}</span>
+                </label>`).join('')}</div>` : `
+            <div class="flex gap-3">
+                <button onclick="quizAnswers[${s.id}]=true;render()" class="flex-1 py-2 rounded-xl border text-sm font-medium ${quizAnswers[s.id]===true?'border-accent-400 bg-accent-50 text-accent-700':'border-gray-200 text-gray-600'}">Benar</button>
+                <button onclick="quizAnswers[${s.id}]=false;render()" class="flex-1 py-2 rounded-xl border text-sm font-medium ${quizAnswers[s.id]===false?'border-red-400 bg-red-50 text-red-700':'border-gray-200 text-gray-600'}">Salah</button>
+            </div>`}
+        </div>`).join('')}
+    </div>
+    <div class="mt-6 flex justify-between items-center">
+        <span class="text-sm text-gray-500">${Object.keys(quizAnswers).length}/${soalList.length} dijawab</span>
+        <button onclick="quizSubmitted=true;render()" class="px-6 py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition">Submit Jawaban</button>
+    </div>`;
+}
+
+function renderQuizResults() {
+    let correct = 0;
+    soalList.forEach(s => { if(quizAnswers[s.id] === s.answer) correct++; });
+    const score = Math.round(correct/soalList.length*100);
+    return `
+    <div class="bg-white rounded-2xl shadow-sm p-8 text-center max-w-md mx-auto">
+        <div class="text-5xl mb-4">${score>=75?'🎉':'😥'}</div>
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">Hasil Evaluasi</h2>
+        <div class="text-4xl font-bold ${score>=75?'text-accent-600':'text-red-500'} mb-2">${score}</div>
+        <p class="text-sm text-gray-500 mb-4">Benar: ${correct}/${soalList.length} soal</p>
+        <span class="inline-block text-xs px-3 py-1 rounded-full ${score>=75?'bg-accent-100 text-accent-700':'bg-red-100 text-red-600'}">${score>=75?'✅ Tuntas':'❌ Belum Tuntas'}</span>
+        <button onclick="quizSubmitted=false;quizAnswers={};render()" class="block mx-auto mt-6 px-6 py-2 bg-primary-600 text-white rounded-xl text-sm hover:bg-primary-700">Coba Lagi</button>
+    </div>`;
+}
+
+function renderNilaiSaya() {
+    return siswaLayout(`
+    <div class="mb-6"><h1 class="text-2xl font-bold text-gray-800">📊 Nilai Saya</h1></div>
+    <div class="grid md:grid-cols-3 gap-4 mb-6">
+        <div class="bg-white rounded-2xl p-5 shadow-sm text-center"><div class="text-3xl font-bold text-primary-600">85</div><div class="text-xs text-gray-500">Rata-rata</div></div>
+        <div class="bg-white rounded-2xl p-5 shadow-sm text-center"><div class="text-3xl font-bold text-accent-600">95</div><div class="text-xs text-gray-500">Tertinggi</div></div>
+        <div class="bg-accent-50 rounded-2xl p-5 shadow-sm text-center"><div class="text-lg font-bold text-accent-700">✅ Tuntas</div><div class="text-xs text-gray-500">Status</div></div>
+    </div>
+    <div class="bg-white rounded-2xl p-6 shadow-sm mb-6">
+        <h3 class="font-semibold text-gray-800 mb-4">Grafik Perkembangan</h3>
+        <div class="h-40 flex items-end gap-3 justify-around">
+            ${[70,75,80,78,85,88,90,85].map((v,i)=>`<div class="flex flex-col items-center gap-1 flex-1"><span class="text-xs text-gray-500">${v}</span><div class="w-full bg-gradient-to-t from-accent-500 to-accent-300 rounded-t-lg" style="height:${v}%"></div><span class="text-xs text-gray-400">E${i+1}</span></div>`).join('')}
+        </div>
+    </div>
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left text-xs text-gray-500">Evaluasi</th><th class="px-4 py-3 text-left text-xs text-gray-500">Materi</th><th class="px-4 py-3 text-left text-xs text-gray-500">Nilai</th><th class="px-4 py-3 text-left text-xs text-gray-500">Status</th></tr></thead>
+        <tbody>${materiList.map((m,i)=>{const v=[85,90,78,92][i];return`<tr class="border-t border-gray-50"><td class="px-4 py-3 text-sm">Eval ${i+1}</td><td class="px-4 py-3 text-sm text-gray-600">${m.title}</td><td class="px-4 py-3 text-sm font-semibold ${v>=75?'text-accent-600':'text-red-500'}">${v}</td><td class="px-4 py-3"><span class="text-xs px-2 py-0.5 rounded-full ${v>=75?'bg-accent-100 text-accent-700':'bg-red-100 text-red-600'}">${v>=75?'Tuntas':'Belum'}</span></td></tr>`;}).join('')}</tbody></table>
+    </div>`, 'nilai-saya');
+}
+
+function renderRankingSiswa() {
+    const sorted = [...siswaList].sort((a,b)=>b.nilai-a.nilai);
+    return siswaLayout(`
+    <div class="mb-6"><h1 class="text-2xl font-bold text-gray-800">🏆 Ranking</h1></div>
+    <div class="bg-gradient-to-r from-primary-600 to-sky-500 rounded-2xl p-6 text-white text-center mb-6">
+        <div class="text-4xl mb-2">🥉</div>
+        <div class="text-3xl font-bold">Peringkat #3</div>
+        <p class="text-white/70 text-sm">Dari ${siswaList.length} siswa</p>
+    </div>
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left text-xs text-gray-500">#</th><th class="px-4 py-3 text-left text-xs text-gray-500">Nama</th><th class="px-4 py-3 text-left text-xs text-gray-500">Nilai</th></tr></thead>
+        <tbody>${sorted.map((s,i)=>`<tr class="border-t border-gray-50 ${i===2?'bg-primary-50':'hover:bg-gray-50'}"><td class="px-4 py-3 text-sm font-bold ${i<3?'text-primary-600':'text-gray-500'}">${i+1}</td><td class="px-4 py-3 text-sm font-medium text-gray-800">${s.nama}${i===2?' (Kamu)':''}</td><td class="px-4 py-3 text-sm font-semibold text-primary-600">${s.nilai}</td></tr>`).join('')}</tbody></table>
+    </div>`, 'ranking-siswa');
+}
+
+function renderProfilSaya() {
+    return siswaLayout(`
+    <div class="max-w-lg mx-auto">
+        <div class="bg-gradient-to-br from-primary-600 to-sky-500 rounded-3xl p-8 text-center text-white mb-6">
+            <div class="w-24 h-24 bg-white/20 rounded-full mx-auto flex items-center justify-center text-4xl mb-4">👤</div>
+            <h2 class="text-xl font-bold">${userName}</h2>
+            <p class="text-white/70 text-sm">Kelas ${userClass}</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm p-6 mb-4">
+            <h3 class="font-semibold text-gray-800 mb-4">📊 Statistik Belajar</h3>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">Materi Selesai</span><span class="text-sm font-bold text-primary-600">4/4</span></div>
+                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">Lab Selesai</span><span class="text-sm font-bold text-sky-600">3/4</span></div>
+                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">Nilai Rata-rata</span><span class="text-sm font-bold text-accent-600">85</span></div>
+                <div class="flex justify-between items-center"><span class="text-sm text-gray-600">Peringkat</span><span class="text-sm font-bold text-yellow-600">#3</span></div>
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm p-6">
+            <h3 class="font-semibold text-gray-800 mb-4">🏅 Badge</h3>
+            <div class="grid grid-cols-3 gap-3">
+                <div class="text-center p-3 bg-primary-50 rounded-xl"><div class="text-2xl mb-1">🔬</div><div class="text-xs font-medium text-gray-600">Eksplorator</div></div>
+                <div class="text-center p-3 bg-accent-50 rounded-xl"><div class="text-2xl mb-1">🌟</div><div class="text-xs font-medium text-gray-600">Bintang</div></div>
+                <div class="text-center p-3 bg-sky-50 rounded-xl"><div class="text-2xl mb-1">📚</div><div class="text-xs font-medium text-gray-600">Rajin</div></div>
+            </div>
+        </div>
+    </div>`, 'profil-saya');
+}
+
+// =======================
+// ELEMENT SDK INIT
+// =======================
+if (window.elementSdk) {
+    window.elementSdk.init({
+        defaultConfig,
+        onConfigChange: async (config) => {
+            const navTitle = document.getElementById('nav-title');
+            if (navTitle) navTitle.textContent = config.nav_title || defaultConfig.nav_title;
+            const heroDesc = document.getElementById('hero-desc');
+            if (heroDesc) heroDesc.textContent = config.hero_desc || defaultConfig.hero_desc;
+            const aboutName = document.getElementById('about-name');
+            if (aboutName) aboutName.textContent = config.about_name || defaultConfig.about_name;
+            const aboutPos = document.getElementById('about-position');
+            if (aboutPos) aboutPos.textContent = config.about_position || defaultConfig.about_position;
+
+            const font = config.font_family || defaultConfig.font_family;
+            document.body.style.fontFamily = `${font}, Poppins, sans-serif`;
+
+            const size = config.font_size || defaultConfig.font_size;
+            document.body.style.fontSize = `${size}px`;
+        },
+        mapToCapabilities: (config) => ({
+            recolorables: [
+                { get: () => config.primary_color || defaultConfig.primary_color, set: (v) => { config.primary_color = v; window.elementSdk.setConfig({primary_color:v}); }},
+                { get: () => config.surface_color || defaultConfig.surface_color, set: (v) => { config.surface_color = v; window.elementSdk.setConfig({surface_color:v}); }},
+                { get: () => config.text_color || defaultConfig.text_color, set: (v) => { config.text_color = v; window.elementSdk.setConfig({text_color:v}); }},
+                { get: () => config.action_color || defaultConfig.action_color, set: (v) => { config.action_color = v; window.elementSdk.setConfig({action_color:v}); }},
+                { get: () => config.secondary_action_color || defaultConfig.secondary_action_color, set: (v) => { config.secondary_action_color = v; window.elementSdk.setConfig({secondary_action_color:v}); }}
+            ],
+            borderables: [],
+            fontEditable: { get: () => config.font_family || defaultConfig.font_family, set: (v) => { config.font_family = v; window.elementSdk.setConfig({font_family:v}); }},
+            fontSizeable: { get: () => config.font_size || defaultConfig.font_size, set: (v) => { config.font_size = v; window.elementSdk.setConfig({font_size:v}); }}
+        }),
+        mapToEditPanelValues: (config) => new Map([
+            ["nav_title", config.nav_title || defaultConfig.nav_title],
+            ["hero_desc", config.hero_desc || defaultConfig.hero_desc],
+            ["about_name", config.about_name || defaultConfig.about_name],
+            ["about_position", config.about_position || defaultConfig.about_position]
+        ])
+    });
+}
+
+// Initial render
+render();
+</script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a043b42bb8ecd4f1',t:'MTc4MDIwNjY1NQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
