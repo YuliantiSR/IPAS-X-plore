@@ -693,35 +693,21 @@ function renderMateriSiswa() {
 
 function renderMateriDetail() {
     const materiContent = {
-        1: { title:'🧬 Ciri-Ciri Makhluk Hidup', sections: [
-            {id:'intro',icon:'🧬',title:'Pengantar',content:'Makhluk hidup adalah segala sesuatu yang memiliki kehidupan dan melakukan berbagai aktivitas biologis.',illustrations:['👤 Manusia','🐱 Kucing','🌳 Pohon','🍄 Jamur','🦠 Bakteri']},
-            {id:'respirasi',icon:'🫁',title:'1. Bernapas (Respirasi)',desc:'Semua makhluk hidup melakukan respirasi untuk energi',examples:['Manusia: paru-paru','Ikan: insang','Serangga: trakea','Tumbuhan: stomata'],fact:'💡 Tumbuhan juga bernapas sepanjang waktu.',quiz:{q:'Apa fungsi utama respirasi?',opts:['Memperoleh energi','Menghasilkan makanan','Berkembang biak','Bergerak'],ans:0}},
-            {id:'makanan',icon:'🍎',title:'2. Memerlukan Makanan',desc:'Semua makhluk hidup membutuhkan energi',examples:['Manusia: dari makanan','Hewan: dari tumbuhan/hewan lain','Tumbuhan: fotosintesis'],fact:'💡 Fotosintesis: Cahaya + Air + CO₂ → Glukosa + O₂',quiz:{q:'Siapa yang membuat makanan sendiri?',opts:['Manusia','Hewan','Tumbuhan','Bakteri'],ans:2}},
-            {id:'gerak',icon:'🚀',title:'3. Bergerak',desc:'Semua makhluk hidup dapat bergerak',examples:['Burung terbang','Ikan berenang','Bunga matahari mengikuti cahaya'],fact:'💡 Gerakan tumbuhan bisa sangat lambat.',quiz:{q:'Gerak bunga matahari disebut...',opts:['Fototropisme','Geotropisme','Hidrotropisme','Tigmotropisme'],ans:0}},
-            {id:'tumbuh',icon:'📈',title:'4. Tumbuh dan Berkembang',desc:'Pertumbuhan = ukuran, Perkembangan = kedewasaan',examples:['Bayi → Anak → Remaja → Dewasa','Biji → Tunas → Tanaman dewasa'],fact:'💡 Pertumbuhan karena pembelahan sel.',quiz:{q:'Perbedaan pertumbuhan dan perkembangan?',opts:['Tidak ada','Ukuran vs kedewasaan','Perkembangan dulu','Hanya tumbuhan'],ans:1}},
-            {id:'reproduksi',icon:'👶',title:'5. Berkembang Biak',desc:'Mempertahankan kelangsungan jenis',examples:['Ayam bertelur (ovipar)','Kucing melahirkan (vivipar)','Tumbuhan: biji/tunas'],fact:'💡 Reproduksi memastikan spesies tidak punah.',quiz:{q:'Hewan bertelur disebut...',opts:['Vivipar','Ovipar','Ovovivipar','Aseksual'],ans:1}},
-            {id:'rangsang',icon:'⚡',title:'6. Peka Terhadap Rangsangan',desc:'Merespons perubahan lingkungan',examples:['Refleks: tangan dari benda panas','Putri malu menutup daun','Pupil membesar di gelap'],fact:'💡 Respons membantu bertahan hidup.',quiz:{q:'Putri malu merespons rangsangan...',opts:['Cahaya','Sentuhan','Panas','Dingin'],ans:1}},
-            {id:'ekskresi',icon:'💦',title:'7. Ekskresi',desc:'Mengeluarkan zat sisa metabolisme',examples:['Keringat: kulit','Urine: ginjal','CO₂: paru-paru'],fact:'💡 Penumpukan zat sisa berbahaya.',quiz:{q:'Yang BUKAN zat sisa metabolisme?',opts:['Keringat','Urine','Darah','CO₂'],ans:2}},
-            {id:'adaptasi',icon:'🦬',title:'8. Beradaptasi',desc:'Menyesuaikan diri dengan lingkungan',examples:['Kaktus: daun duri','Unta: punuk lemak','Beruang kutub: bulu tebal'],fact:'💡 Adaptasi terbentuk melalui evolusi.',quiz:{q:'Kaktus berdaun duri adalah adaptasi...',opts:['Struktur','Perilaku','Fisiologi','Bukan adaptasi'],ans:0}}
-        ]},
-        2: { title:'🌍 Ekosistem', sections: [
+        
+
+        1: { title:'🌍 Ekosistem', sections: [
             {id:'intro',icon:'🌍',title:'Pengantar Ekosistem',content:'Ekosistem adalah sistem makhluk hidup dan lingkungan fisik yang saling berinteraksi.',illustrations:['🌲 Hutan','🌊 Laut','🏜️ Gurun','💧 Sungai','🌾 Padang']},
             {id:'biotik',icon:'🦁',title:'1. Komponen Biotik',desc:'Makhluk hidup dalam ekosistem',examples:['Produsen: tumbuhan hijau','Konsumen: hewan','Pengurai: bakteri, jamur'],fact:'💡 Ketiga jenis organisme ini menjaga keseimbangan.',quiz:{q:'Peran produsen dalam ekosistem?',opts:['Memakan konsumen','Membuat makanan dari matahari','Mengurai bahan organik','Memakan pengurai'],ans:1}},
             {id:'abiotik',icon:'☀️',title:'2. Komponen Abiotik',desc:'Faktor fisik yang mempengaruhi makhluk hidup',examples:['Cahaya matahari','Air','Tanah','Udara dan suhu'],fact:'💡 Komponen abiotik menentukan jenis organisme yang bisa hidup.',quiz:{q:'Sumber energi utama ekosistem?',opts:['Matahari','Air','Tanah','Udara'],ans:0}},
             {id:'rantai',icon:'🔗',title:'3. Rantai Makanan',desc:'Urutan pemindahan energi antar organisme',examples:['Rumput → Belalang → Ayam → Manusia','Alga → Ikan kecil → Ikan besar'],fact:'💡 Setiap rantai dimulai dari produsen.',quiz:{q:'Awal rantai makanan selalu?',opts:['Hewan herbivora','Tumbuhan hijau','Bakteri','Jamur'],ans:1}},
             {id:'keseimbangan',icon:'⚖️',title:'4. Keseimbangan Ekosistem',desc:'Kondisi harmonis semua komponen',examples:['Populasi predator-mangsa seimbang','Nutrisi tanah mencukupi','Tidak ada pencemaran berlebihan'],fact:'💡 Keseimbangan dapat terganggu oleh alam atau manusia.',quiz:{q:'Tanda ekosistem seimbang?',opts:['Banyak limbah','Keanekaragaman tinggi','Satu jenis saja','Tidak ada pengurai'],ans:1}}
         ]},
-        3: { title:'🤝 Interaksi Dalam Ekosistem', sections: [
+        2: { title:'🤝 Interaksi Dalam Ekosistem', sections: [
             {id:'intro',icon:'🤝',title:'Pengantar',content:'Interaksi dalam ekosistem meliputi hubungan antar makhluk hidup yang saling mempengaruhi.',illustrations:['🦁 Predator','🦌 Mangsa','🌺 Simbiosis','🐜 Kompetisi','🦠 Parasit']},
             {id:'simbiosis',icon:'🤝',title:'1. Simbiosis',desc:'Hubungan erat dua spesies berbeda',examples:['Mutualisme: lebah dan bunga','Parasitisme: kutu dan anjing','Komensalisme: ikan remora dan hiu'],fact:'💡 Simbiosis mutualisme saling menguntungkan.',quiz:{q:'Hubungan lebah-bunga adalah...',opts:['Parasitisme','Mutualisme','Komensalisme','Kompetisi'],ans:1}},
             {id:'predasi',icon:'🦁',title:'2. Predasi',desc:'Hubungan pemangsa dan mangsa',examples:['Singa memangsa rusa','Elang memangsa tikus','Ular memangsa katak'],fact:'💡 Predasi mengontrol populasi mangsa.',quiz:{q:'Predasi berfungsi untuk...',opts:['Menghancurkan ekosistem','Mengontrol populasi','Membunuh semua mangsa','Tidak ada fungsi'],ans:1}}
         ]},
-        4: { title:'🌱 Pencemaran dan Pelestarian', sections: [
-            {id:'intro',icon:'🌱',title:'Pengantar',content:'Pencemaran lingkungan dan upaya pelestarian merupakan tantangan penting bagi keseimbangan ekosistem.',illustrations:['🏭 Polusi','🌊 Pencemaran Air','🌬️ Polusi Udara','♻️ Daur Ulang','🌳 Reboisasi']},
-            {id:'pencemaran',icon:'🏭',title:'1. Jenis Pencemaran',desc:'Pencemaran dapat terjadi di air, udara, dan tanah',examples:['Pencemaran air: limbah pabrik','Pencemaran udara: asap kendaraan','Pencemaran tanah: pestisida'],fact:'💡 Pencemaran menurunkan kualitas lingkungan hidup.',quiz:{q:'Penyebab pencemaran air?',opts:['Reboisasi','Limbah pabrik','Daur ulang','Penghijauan'],ans:1}},
-            {id:'pelestarian',icon:'🌳',title:'2. Upaya Pelestarian',desc:'Langkah menjaga kelestarian lingkungan',examples:['Reboisasi: menanam kembali hutan','Reduce, Reuse, Recycle','Taman nasional dan cagar alam'],fact:'💡 Setiap individu dapat berkontribusi pada pelestarian.',quiz:{q:'3R dalam pelestarian adalah...',opts:['Read, Run, Rest','Reduce, Reuse, Recycle','Red, Rose, Rain','React, Repeat, Return'],ans:1}}
-        ]}
-    };
+
 
     const content = materiContent[currentMateri] || materiContent[1];
     return `
@@ -758,11 +744,40 @@ function renderMateriDetail() {
                 </div>
             `}
         </div>`).join('')}
-        <div class="flex gap-3">
-            <button onclick="navigate('materi-siswa')" class="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition text-center">← Kembali</button>
-            <button onclick="navigate('kerjakan-soal')" class="flex-1 px-4 py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition text-center">Ujian Materi →</button>
-        </div>
-    </div>
+        <div class="grid md:grid-cols-4 gap-3">
+
+<button
+onclick="navigate('materi-siswa')"
+class="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200">
+
+← Kembali
+
+</button>
+
+<button
+onclick="window.open('https://youtube.com','_blank')"
+class="px-4 py-3 bg-red-500 text-white rounded-xl font-medium hover:bg-red-600">
+
+🎥 Video
+
+</button>
+
+<button
+onclick="window.open('https://drive.google.com','_blank')"
+class="px-4 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700">
+
+📄 PDF
+
+</button>
+
+<button
+onclick="navigate('kerjakan-soal')"
+class="px-4 py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700">
+
+📝 Latihan
+
+</button>
+
 </div>`;
 }
 
