@@ -109,17 +109,20 @@ function loginUser() {
 const stats = { siswa:248, materi:32, praktikum:18, proyek:12, soal:156, rataRata:78.5 };
 
 const materiList = [
-    { id:1, title:"Ciri Makhluk Hidup", desc:"Memahami karakteristik dan sifat-sifat makhluk hidup", icon:"🧬", progress:90 },
-    { id:2, title:"Ekosistem", desc:"Komponen dan struktur ekosistem serta hubungan antar organisme", icon:"🌍", progress:85 },
-    { id:3, title:"Interaksi Dalam Ekosistem", desc:"Simbiosis, predasi, dan kompetisi dalam alam", icon:"🤝", progress:60 },
-    { id:4, title:"Pencemaran dan Pelestarian Lingkungan", desc:"Keanekaragaman hayati dan upaya konservasi", icon:"🌱", progress:40 }
-];
-
-const labList = [
-    { id:1, title:"Pengukuran Massa dan Volume", cat:"🔬 Pengukuran", desc:"Simulasi penggunaan neraca dan gelas ukur" },
-    { id:3, title:"Rantai Makanan Ekosistem", cat:"🌱 Ekosistem", desc:"Simulasi jaring-jaring makanan" },
-    { id:5, title:"Siklus Air", cat:"💧 Siklus Air", desc:"Simulasi evaporasi dan kondensasi" },
-    { id:6, title:"Perpindahan Kalor", cat:"🌡️ Suhu dan Kalor", desc:"Eksperimen konduksi, konveksi, radiasi" }
+    {
+        id: 1,
+        title: "Ekosistem",
+        desc: "Mempelajari komponen biotik dan abiotik, rantai makanan, jaring-jaring makanan, serta keseimbangan ekosistem.",
+        icon: "🌍",
+        progress: 0
+    },
+    {
+        id: 2,
+        title: "Interaksi Dalam Ekosistem",
+        desc: "Mempelajari simbiosis, predasi, kompetisi, adaptasi makhluk hidup, dan keseimbangan ekosistem.",
+        icon: "🤝",
+        progress: 0
+    }
 ];
 
 const proyekList = [
@@ -219,7 +222,7 @@ function renderLanding() {
         <a href="#tentang" class="nav-link text-sm text-gray-600 hover:text-primary-600 font-medium">Tentang</a>
         <button onclick="navigate('login-guru')" class="px-5 py-2 bg-primary-600 text-white text-sm font-semibold rounded-lg hover:bg-primary-700 transition">Masuk</button>
     </div>
-    <button onclick="navigate('login-guru')" class="md:hidden px-4 py-2 bg-primary-600 text-white text-sm rounded-lg">Masuk</button>
+                <button onclick="navigate('login-guru')" class="md:hidden px-4 py-2 bg-primary-600 text-white text-sm rounded-lg">Masuk</button>
 </nav>
 
 <!-- Hero -->
@@ -235,18 +238,13 @@ function renderLanding() {
             <p class="text-base md:text-lg text-gray-700 mb-8 leading-relaxed max-w-lg" id="hero-desc">${cfg.hero_desc || defaultConfig.hero_desc}</p>
             <div class="flex flex-col sm:flex-row gap-3 mb-10">
                 <button onclick="navigate('login-guru')" class="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all shadow-lg hover:shadow-xl hover:scale-105 flex items-center justify-center gap-2 text-sm">
-                    <i data-lucide="graduation-cap" class="w-5 h-5"></i>👩‍🏫 Masuk Sebagai Guru
+                    <i data-lucide="graduation-cap" class="w-5 h-5"></i>Masuk Sebagai Guru
                 </button>
                 <button onclick="navigate('login-siswa')" class="px-6 py-3 bg-white border-2 border-accent-500 text-accent-600 font-semibold rounded-lg hover:bg-accent-50 transition-all shadow-md hover:shadow-lg hover:scale-105 flex items-center justify-center gap-2 text-sm">
-                    <i data-lucide="book-open" class="w-5 h-5"></i>👨‍🎓 Masuk Sebagai Siswa
+                    <i data-lucide="book-open" class="w-5 h-5"></i>Masuk Sebagai Siswa
                 </button>
             </div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <div class="text-center p-3 bg-white/70 backdrop-blur rounded-lg border border-gray-100/50"><div class="text-2xl font-bold text-primary-600">248</div><div class="text-xs text-gray-600">Siswa</div></div>
-                <div class="text-center p-3 bg-white/70 backdrop-blur rounded-lg border border-gray-100/50"><div class="text-2xl font-bold text-accent-600">32</div><div class="text-xs text-gray-600">Materi</div></div>
-                <div class="text-center p-3 bg-white/70 backdrop-blur rounded-lg border border-gray-100/50"><div class="text-2xl font-bold text-sky-600">18</div><div class="text-xs text-gray-600">Praktikum</div></div>
-                <div class="text-center p-3 bg-white/70 backdrop-blur rounded-lg border border-gray-100/50"><div class="text-2xl font-bold text-green-600">98%</div><div class="text-xs text-gray-600">Puas</div></div>
-            </div>
+
         </div>
         <div class="order-1 md:order-2 flex items-center justify-center">
             <svg viewBox="0 0 400 400" class="w-64 h-64 md:w-80 md:h-80 drop-shadow-2xl" xmlns="http://www.w3.org/2000/svg">
@@ -277,53 +275,23 @@ function renderLanding() {
             <div class="group bg-gradient-to-br from-sky-50 to-sky-100/30 rounded-2xl p-7 border border-sky-200/50 shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
                 <div class="w-14 h-14 bg-gradient-to-br from-sky-400 to-sky-500 rounded-xl flex items-center justify-center text-white mb-6 shadow-lg"><i data-lucide="flask-conical" class="w-6 h-6"></i></div>
                 <h3 class="text-xl font-bold text-gray-900 mb-3">Laboratorium Virtual</h3>
-                <p class="text-gray-700 leading-relaxed mb-5 text-sm">Simulasi eksperimen digital interaktif tanpa keterbatasan ruang, waktu, dan biaya.</p>
-                <ul class="space-y-2.5 text-sm text-gray-700">
-                    <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-sky-500 flex-shrink-0"></i>18 eksperimen tersedia</li>
-                    <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-sky-500 flex-shrink-0"></i>Hasil akurat dan terukur</li>
-                    <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-sky-500 flex-shrink-0"></i>Laporan otomatis</li>
-                </ul>
+                <p class="text-gray-700 leading-relaxed text-sm">Simulasi eksperimen digital interaktif tanpa keterbatasan ruang, waktu, dan biaya.</p>
             </div>
             <div class="group bg-gradient-to-br from-accent-50 to-accent-100/30 rounded-2xl p-7 border border-accent-200/50 shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
                 <div class="w-14 h-14 bg-gradient-to-br from-accent-400 to-accent-500 rounded-xl flex items-center justify-center text-white mb-6 shadow-lg"><i data-lucide="globe" class="w-6 h-6"></i></div>
                 <h3 class="text-xl font-bold text-gray-900 mb-3">Proyek IPAS</h3>
-                <p class="text-gray-700 leading-relaxed mb-5 text-sm">Pembelajaran berbasis masalah nyata yang mengembangkan keterampilan 4C siswa.</p>
-                <ul class="space-y-2.5 text-sm text-gray-700">
-                    <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-accent-500 flex-shrink-0"></i>12 proyek aktif</li>
-                    <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-accent-500 flex-shrink-0"></i>Berbasis masalah nyata</li>
-                    <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-accent-500 flex-shrink-0"></i>Kolaborasi tim</li>
-                </ul>
+                <p class="text-gray-700 leading-relaxed text-sm">Pembelajaran berbasis masalah nyata yang mengembangkan keterampilan siswa.</p>
             </div>
             <div class="group bg-gradient-to-br from-primary-50 to-primary-100/30 rounded-2xl p-7 border border-primary-200/50 shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
                 <div class="w-14 h-14 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center text-white mb-6 shadow-lg"><i data-lucide="bar-chart-2" class="w-6 h-6"></i></div>
                 <h3 class="text-xl font-bold text-gray-900 mb-3">Evaluasi Digital</h3>
-                <p class="text-gray-700 leading-relaxed mb-5 text-sm">Sistem penilaian komprehensif dengan feedback langsung dan analitik mendalam.</p>
-                <ul class="space-y-2.5 text-sm text-gray-700">
-                    <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-primary-600 flex-shrink-0"></i>156 soal tersedia</li>
-                    <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-primary-600 flex-shrink-0"></i>Feedback langsung</li>
-                    <li class="flex items-center gap-2.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-primary-600 flex-shrink-0"></i>Analytics mendalam</li>
-                </ul>
+                <p class="text-gray-700 leading-relaxed text-sm">Sistem penilaian komprehensif dengan feedback langsung dan analitik mendalam.</p>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Statistik -->
-<div class="bg-gray-50 py-16 px-6 md:px-8 pattern-bg">
-    <div class="max-w-7xl mx-auto">
-        <h2 class="text-center text-3xl md:text-4xl font-black text-gray-900 mb-4">Platform Kami Dalam Angka</h2>
-        <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">Berkembang bersama siswa yang telah merasakan manfaat pembelajaran IPAS modern</p>
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-            ${[{i:'📚',v:'32',l:'Materi',s:'+5 baru'},{i:'🧪',v:'18',l:'Praktikum',s:'Aktif'},{i:'🌍',v:'12',l:'Proyek',s:'Berlangsung'},{i:'📝',v:'156',l:'Evaluasi',s:'Tersedia'},{i:'👥',v:'248',l:'Siswa',s:'T.A. berjalan'}].map(s=>`
-            <div class="stat-card bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all border border-gray-100 text-center">
-                <div class="w-12 h-12 mx-auto mb-4 bg-primary-100 rounded-xl flex items-center justify-center text-lg">${s.i}</div>
-                <div class="text-3xl font-black text-primary-600 mb-1">${s.v}</div>
-                <div class="text-sm text-gray-600 font-semibold">${s.l}</div>
-                <p class="text-xs text-gray-400 mt-1">${s.s}</p>
-            </div>`).join('')}
-        </div>
-    </div>
-</div>
+
 
 <!-- Lab Section -->
 <div id="lab" class="bg-white py-16 px-6 md:px-8">
@@ -332,7 +300,7 @@ function renderLanding() {
             <div class="inline-flex items-center gap-2 bg-sky-50 border border-sky-200 rounded-full px-4 py-2 text-sky-700 text-sm font-medium mb-4"><i data-lucide="flask-conical" class="w-4 h-4"></i>Laboratorium Virtual</div>
             <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Eksperimen Sains Tanpa Batas</h2>
             <p class="text-lg text-gray-600 mb-6">Lakukan simulasi eksperimen sains secara interaktif kapan saja dan di mana saja.</p>
-            <button onclick="navigate('login-siswa')" class="px-8 py-3 bg-sky-600 text-white font-semibold rounded-xl hover:bg-sky-700 transition-all inline-flex items-center gap-2"><i data-lucide="play" class="w-4 h-4"></i>Mulai Praktikum</button>
+                <button onclick="navigate('login-siswa')" class="px-8 py-3 bg-sky-600 text-white font-semibold rounded-xl hover:bg-sky-700 transition-all inline-flex items-center gap-2"><i data-lucide="play" class="w-4 h-4"></i>Mulai Praktikum</button>
         </div>
         <div class="grid grid-cols-2 gap-4">
             ${[{i:'🔬',t:'Mikroskop Digital'},{i:'🧪',t:'Tabung Reaksi'},{i:'⚛️',t:'Model Atom'},{i:'🧬',t:'DNA Explorer'}].map(item=>`
@@ -993,5 +961,5 @@ if (window.elementSdk) {
 // Initial render
 render();
 </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a043b42bb8ecd4f1',t:'MTc4MDIwNjY1NQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a06d8a7def76135a',t:'MTc4MDY0NTM1MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
