@@ -1097,9 +1097,37 @@ function renderProyekSiswa() {
 
 function renderKerjakanSoal() {
     return siswaLayout(`
-    <div class="flex items-center justify-between mb-6">
-        <div><h1 class="text-2xl font-bold text-gray-800">📝 Kerjakan Soal</h1><p class="text-gray-500 text-sm">Evaluasi pemahaman materi</p></div>
-    </div>
+    <div class="mb-6">
+
+<h1 class="text-2xl font-bold text-gray-800">
+
+📝 Tantangan IPAS
+
+</h1>
+
+<p class="text-gray-500 text-sm">
+
+Uji pemahamanmu dan raih hasil terbaik!
+
+</p>
+
+</div>
+
+<div class="bg-gradient-to-r from-primary-600 to-sky-500 rounded-2xl p-5 text-white mb-6">
+
+<h3 class="font-bold text-lg mb-2">
+
+🎯 Tantangan Hari Ini
+
+</h3>
+
+<p class="text-sm text-white/90">
+
+Kerjakan soal dengan teliti dan tunjukkan kemampuan terbaikmu!
+
+</p>
+
+</div>
     ${quizSubmitted ? renderQuizResults() : renderQuizQuestions()}`, 'kerjakan-soal');
 }
 
@@ -1144,7 +1172,115 @@ function renderQuizResults() {
         <button onclick="quizSubmitted=false;quizAnswers={};render()" class="block mx-auto mt-6 px-6 py-2 bg-primary-600 text-white rounded-xl text-sm hover:bg-primary-700">Coba Lagi</button>
     </div>`;
 }
+function renderRefleksiSiswa() {
+    return siswaLayout(`
+    
+    <div class="max-w-4xl mx-auto">
 
+        <div class="bg-white rounded-2xl shadow-sm p-6">
+
+            <h1 class="text-2xl font-bold text-gray-800 mb-3">
+
+                💬 Refleksi Pembelajaran
+
+            </h1>
+
+            <p class="text-gray-500 mb-6">
+
+                Luangkan waktu sejenak untuk merefleksikan pembelajaran hari ini.
+
+            </p>
+
+            <div class="space-y-5">
+
+                <div>
+
+                    <label class="font-medium text-gray-700">
+
+                        📚 Apa yang saya pelajari hari ini?
+
+                    </label>
+
+                    <textarea
+                    class="w-full mt-2 p-3 border rounded-xl"
+                    rows="3"></textarea>
+
+                </div>
+
+                <div>
+
+                    <label class="font-medium text-gray-700">
+
+                        🌟 Bagian yang paling menarik?
+
+                    </label>
+
+                    <textarea
+                    class="w-full mt-2 p-3 border rounded-xl"
+                    rows="3"></textarea>
+
+                </div>
+
+                <div>
+
+                    <label class="font-medium text-gray-700">
+
+                        🤔 Bagian yang masih sulit dipahami?
+
+                    </label>
+
+                    <textarea
+                    class="w-full mt-2 p-3 border rounded-xl"
+                    rows="3"></textarea>
+
+                </div>
+
+                <div>
+
+                    <label class="font-medium text-gray-700">
+
+                        🚀 Apa rencana saya untuk belajar lebih baik?
+
+                    </label>
+
+                    <textarea
+                    class="w-full mt-2 p-3 border rounded-xl"
+                    rows="3"></textarea>
+
+                </div>
+
+                <div class="bg-blue-50 rounded-xl p-4">
+
+                    <p class="text-sm text-blue-700 text-center">
+
+                        💡 Terima kasih telah mengikuti pembelajaran hari ini.
+
+                        <br><br>
+
+                        Setelah mengisi refleksi, silakan kirimkan jawabanmu melalui formulir berikut.
+
+                    </p>
+
+                </div>
+
+                <button
+
+                onclick="window.open('https://forms.gle/uYLaDDCFQR7Ybqcf6','_blank')"
+
+                class="w-full py-3 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700">
+
+                    🚀 Kirim Refleksi
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    `, 'refleksi-siswa');
+}
 function renderNilaiSaya() {
     return siswaLayout(`
     <div class="mb-6"><h1 class="text-2xl font-bold text-gray-800">📊 Nilai Saya</h1></div>
