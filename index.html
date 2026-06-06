@@ -789,7 +789,31 @@ function renderRanking() {
 // =======================
 function renderDashboardSiswa() {
     return siswaLayout(`
-    <div class="mb-6"><h1 class="text-2xl font-bold text-gray-800">Halo, ${userName}! 👋</h1><p class="text-gray-500 text-sm">Selamat belajar hari ini!</p></div>
+    <div class="mb-8">
+
+<img
+src="banner-ipas-xplore.png.png"
+class="w-full rounded-3xl shadow-lg mb-6">
+
+<h1 class="text-3xl font-bold text-gray-800">
+
+Halo, ${userName}! 👋
+
+</h1>
+
+<p class="text-gray-600 mt-2">
+
+🚀 Selamat datang di IPAS X-plore
+
+</p>
+
+<p class="text-sm text-gray-500">
+
+🌿 Eksplorasi Sains • 🔬 Bangun Kreativitas • 🏆 Wujudkan Prestasi
+
+</p>
+
+</div>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         ${[{v:'4/4',l:'Materi Selesai',i:'📚',c:'bg-primary-50'},{v:'3/4',l:'Lab Selesai',i:'🧪',c:'bg-sky-50'},{v:'85',l:'Nilai Rata-rata',i:'📊',c:'bg-accent-50'},{v:'#3',l:'Peringkat',i:'🏆',c:'bg-yellow-50'}].map(s=>`
         <div class="${s.c} rounded-2xl p-4 card-hover"><div class="text-2xl mb-2">${s.i}</div><div class="text-xl font-bold text-gray-800">${s.v}</div><div class="text-xs text-gray-500">${s.l}</div></div>`).join('')}
