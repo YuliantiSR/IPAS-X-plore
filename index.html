@@ -152,12 +152,13 @@ url: "https://wayground.com/join?gc=59802761"
 }
 };
 const proyekList = [
-    { id:1, title:"Pengelolaan Sampah Sekolah", icon:"🌱", progress:75, deadline:"15 Mar 2025" },
-    { id:2, title:"Konservasi Air Bersih", icon:"💧", progress:50, deadline:"22 Mar 2025" },
-    { id:3, title:"Kampanye Pemanasan Global", icon:"🌍", progress:30, deadline:"1 Apr 2025" },
-    { id:4, title:"Energi Terbarukan Mini", icon:"⚡", progress:60, deadline:"10 Apr 2025" },
-    { id:5, title:"Penghijauan Lingkungan", icon:"🌳", progress:20, deadline:"20 Apr 2025" },
-    { id:6, title:"Daur Ulang Kreatif", icon:"♻️", progress:90, deadline:"5 Mar 2025" }
+{
+id:1,
+title:"🌿 Observasi Ekosistem Sekolah",
+icon:"🌿",
+progress:0,
+deadline:"30 Juni 2026"
+}
 ];
 
 const siswaList = [
@@ -984,7 +985,61 @@ function renderProyekSiswa() {
         <div class="bg-white rounded-2xl shadow-sm p-5 card-hover">
             <div class="flex items-center gap-3 mb-3"><span class="text-3xl">${p.icon}</span><div><h3 class="font-semibold text-gray-800 text-sm">${p.title}</h3><span class="text-xs text-gray-400">Deadline: ${p.deadline}</span></div></div>
             <div class="flex justify-between text-xs text-gray-500 mb-1"><span>Progress</span><span>${p.progress}%</span></div>
-            <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-accent-400 to-accent-500 rounded-full progress-bar" style="width:${p.progress}%"></div></div>
+            <div class="bg-white rounded-2xl shadow-sm p-5 card-hover">
+
+<div class="flex items-center gap-3 mb-4">
+<span class="text-4xl">${p.icon}</span>
+<div>
+<h3 class="font-bold text-gray-800">${p.title}</h3>
+<p class="text-xs text-gray-500">
+📅 Deadline: ${p.deadline}
+</p>
+</div>
+</div>
+
+<div class="bg-green-50 rounded-xl p-4 mb-4">
+
+<h4 class="font-semibold text-green-700 mb-2">
+🎯 Tujuan Proyek
+</h4>
+
+<p class="text-sm text-gray-700">
+Mengidentifikasi komponen penyusun ekosistem di lingkungan sekolah.
+</p>
+
+</div>
+
+<div class="space-y-2 mb-4">
+
+<p class="text-sm font-semibold text-gray-700">
+📋 Aktivitas:
+</p>
+
+<p class="text-sm">✅ Amati ekosistem di sekitar sekolah.</p>
+
+<p class="text-sm">📷 Ambil foto lokasi pengamatan.</p>
+
+<p class="text-sm">🌱 Catat komponen biotik.</p>
+
+<p class="text-sm">🪨 Catat komponen abiotik.</p>
+
+<p class="text-sm">🗣 Presentasikan hasil pengamatan.</p>
+
+</div>
+
+<div class="flex justify-between text-xs text-gray-500 mb-2">
+<span>Progress</span>
+<span>${p.progress}%</span>
+</div>
+
+<div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+<div
+class="h-full bg-gradient-to-r from-accent-400 to-accent-500 rounded-full progress-bar"
+style="width:${p.progress}%">
+</div>
+</div>
+
+</div>
         </div>`).join('')}
     </div>`, 'proyek-siswa');
 }
