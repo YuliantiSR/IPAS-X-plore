@@ -810,20 +810,18 @@ Halo, ${userName}! 👋
 </p>
 
 </div>
-
-</div>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
         ${[{v:'4/4',l:'Materi Selesai',i:'📚',c:'bg-primary-50'},{v:'3/4',l:'Lab Selesai',i:'🧪',c:'bg-sky-50'},{v:'85',l:'Nilai Rata-rata',i:'📊',c:'bg-accent-50'},{v:'#3',l:'Peringkat',i:'🏆',c:'bg-yellow-50'}].map(s=>`
         <div class="${s.c} rounded-2xl p-4 card-hover"><div class="text-2xl mb-2">${s.i}</div><div class="text-xl font-bold text-gray-800">${s.v}</div><div class="text-xs text-gray-500">${s.l}</div></div>`).join('')}
     </div>
     <h2 class="font-semibold text-gray-800 mb-3">Aksi Cepat</h2>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-        <button onclick="navigate('materi-siswa')" class="bg-white rounded-xl p-4 shadow-sm card-hover text-center"><div class="text-2xl mb-1">📖</div><div class="text-xs font-medium text-gray-600">Belajar Materi</div></button>
-        <button onclick="navigate('lab-siswa')" class="bg-white rounded-xl p-4 shadow-sm card-hover text-center"><div class="text-2xl mb-1">🔬</div><div class="text-xs font-medium text-gray-600">Lab Virtual</div></button>
-        <button onclick="navigate('kerjakan-soal')" class="bg-white rounded-xl p-4 shadow-sm card-hover text-center"><div class="text-2xl mb-1">📝</div><div class="text-xs font-medium text-gray-600">Kerjakan Soal</div></button>
-        <button onclick="navigate('proyek-siswa')" class="bg-white rounded-xl p-4 shadow-sm card-hover text-center"><div class="text-2xl mb-1">🌍</div><div class="text-xs font-medium text-gray-600">Proyek IPAS</div></button>
-<button onclick="navigate('refleksi-siswa')" class="bg-white rounded-xl p-4 shadow-sm card-hover text-center">
-<div class="text-2xl mb-1">💬</div>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-8">
+        <button onclick="navigate('materi-siswa')" class="bg-white rounded-xl p-5 shadow-sm card-hover text-center"><div class="text-2xl mb-2">📖</div><div class="text-xs font-medium text-gray-600">Belajar Materi</div></button>
+        <button onclick="navigate('lab-siswa')" class="bg-white rounded-xl p-5 shadow-sm card-hover text-center"><div class="text-2xl mb-2">🔬</div><div class="text-xs font-medium text-gray-600">Lab Virtual</div></button>
+        <button onclick="navigate('kerjakan-soal')" class="bg-white rounded-xl p-5 shadow-sm card-hover text-center"><div class="text-2xl mb-2">📝</div><div class="text-xs font-medium text-gray-600">Kerjakan Soal</div></button>
+        <button onclick="navigate('proyek-siswa')" class="bg-white rounded-xl p-5 shadow-sm card-hover text-center"><div class="text-2xl mb-2">🌍</div><div class="text-xs font-medium text-gray-600">Proyek IPAS</div></button>
+<button onclick="navigate('refleksi-siswa')" class="bg-white rounded-xl p-5 shadow-sm card-hover text-center">
+<div class="text-2xl mb-2">💬</div>
 <div class="text-xs font-medium text-gray-600">Refleksi</div>
 </button>
     </div>
