@@ -124,7 +124,45 @@ const materiList = [
         progress: 0
     }
 ];
+const labList = [
+{
+id: 1,
+title: "Rantai Makanan",
+cat: "🌿 Ekosistem",
+desc: "Simulasi aliran energi dalam rantai makanan."
+},
+{
+id: 2,
+title: "Jaring-Jaring Makanan",
+cat: "🌍 Ekosistem",
+desc: "Mengenal hubungan antar makhluk hidup."
+},
+{
+id: 3,
+title: "Simbiosis",
+cat: "🤝 Interaksi",
+desc: "Simulasi mutualisme, komensalisme, dan parasitisme."
+}
+];
+const videoMateri = {
+1: "https://www.youtube.com/watch?v=o3wOlOjYdWg",
+2: "https://www.youtube.com/watch?v=H4fBa5-In8g"
+};
 
+const pdfMateri = {
+1: "https://drive.google.com/file/d/1VACMZs_oABLKVRIEvGgYVKJkEC4riC7e/view",
+2: "https://drive.google.com/file/d/1YpASE2iuCTwQUw6P5_6zO1Ku2oGC3KT0/view"
+};
+onst gameQuiz = {
+1: {
+title: "Game Labirin Ekosistem",
+url: "https://wordwall.net/resource/95575454"
+},
+2: {
+title: "Game Interaksi Ekosistem",
+url: "https://wayground.com/join?gc=59802761"
+}
+};
 const proyekList = [
     { id:1, title:"Pengelolaan Sampah Sekolah", icon:"🌱", progress:75, deadline:"15 Mar 2025" },
     { id:2, title:"Konservasi Air Bersih", icon:"💧", progress:50, deadline:"22 Mar 2025" },
@@ -193,6 +231,9 @@ function render() {
         case "nilai-saya": html = renderNilaiSaya(); break;
         case "ranking-siswa": html = renderRankingSiswa(); break;
         case "profil-saya": html = renderProfilSaya(); break;
+case "refleksi-siswa":
+html = renderRefleksiSiswa();
+break;
         default: html = renderLanding();
     }
     app.innerHTML = html;
@@ -663,6 +704,10 @@ function renderDashboardSiswa() {
         <button onclick="navigate('lab-siswa')" class="bg-white rounded-xl p-4 shadow-sm card-hover text-center"><div class="text-2xl mb-1">🔬</div><div class="text-xs font-medium text-gray-600">Lab Virtual</div></button>
         <button onclick="navigate('kerjakan-soal')" class="bg-white rounded-xl p-4 shadow-sm card-hover text-center"><div class="text-2xl mb-1">📝</div><div class="text-xs font-medium text-gray-600">Kerjakan Soal</div></button>
         <button onclick="navigate('proyek-siswa')" class="bg-white rounded-xl p-4 shadow-sm card-hover text-center"><div class="text-2xl mb-1">🌍</div><div class="text-xs font-medium text-gray-600">Proyek IPAS</div></button>
+<button onclick="navigate('refleksi-siswa')" class="bg-white rounded-xl p-4 shadow-sm card-hover text-center">
+<div class="text-2xl mb-1">💬</div>
+<div class="text-xs font-medium text-gray-600">Refleksi</div>
+</button>
     </div>
     <div class="bg-white rounded-2xl p-5 shadow-sm">
         <h3 class="font-semibold text-gray-800 mb-3">📢 Pengumuman</h3>
@@ -717,6 +762,25 @@ function renderMateriDetail() {
         <button onclick="navigate('materi-siswa')" class="flex items-center gap-2 mb-4 hover:opacity-80 text-sm font-medium"><i data-lucide="chevron-left" class="w-4 h-4"></i>Kembali</button>
         <h1 class="text-3xl font-bold mb-2">${content.title}</h1>
         <p class="text-white/80">Pelajari materi secara lengkap dan interaktif</p>
+<div class="mt-6 bg-white/15 backdrop-blur rounded-2xl p-5">
+
+<h3 class="font-bold text-lg mb-3">
+🎯 Tujuan Pembelajaran
+</h3>
+
+<ul class="space-y-2 text-sm text-white">
+
+<li>✅ Memahami konsep dasar materi.</li>
+
+<li>✅ Mengidentifikasi komponen penting.</li>
+
+<li>✅ Menganalisis hubungan antar konsep.</li>
+
+<li>✅ Menerapkan konsep dalam kehidupan sehari-hari.</li>
+
+</ul>
+
+</div>
     </div>
     <div class="max-w-4xl mx-auto px-4 md:px-6 py-8">
         ${content.sections.map((s,idx)=>`
@@ -745,7 +809,7 @@ function renderMateriDetail() {
                 </div>
             `}
         </div>`).join('')}
-        <div class="grid md:grid-cols-4 gap-3">
+        <div class="grid md:grid-cols-5 gap-3">
 
 <button
 onclick="navigate('materi-siswa')"
@@ -756,7 +820,7 @@ class="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-
 </button>
 
 <button
-onclick="window.open('https://youtube.com','_blank')"
+onclick="window.open(videoMateri[currentMateri],'_blank')"
 class="px-4 py-3 bg-red-500 text-white rounded-xl font-medium hover:bg-red-600">
 
 🎥 Video
@@ -764,13 +828,19 @@ class="px-4 py-3 bg-red-500 text-white rounded-xl font-medium hover:bg-red-600">
 </button>
 
 <button
-onclick="window.open('https://drive.google.com','_blank')"
+onclick="window.open(pdfMateri[currentMateri],'_blank')"
 class="px-4 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700">
 
 📄 PDF
 
 </button>
+<button
+onclick="window.open(gameQuiz[currentMateri].url,'_blank')"
+class="px-4 py-3 bg-yellow-500 text-white rounded-xl font-medium hover:bg-yellow-600">
 
+🎮 Game Quiz
+
+</button>
 <button
 onclick="navigate('kerjakan-soal')"
 class="px-4 py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700">
