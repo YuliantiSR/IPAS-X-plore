@@ -129,19 +129,7 @@ const labList = [
 id: 1,
 title: "Rantai Makanan",
 cat: "🌿 Ekosistem",
-desc: "Simulasi aliran energi dalam rantai makanan."
-},
-{
-id: 2,
-title: "Jaring-Jaring Makanan",
-cat: "🌍 Ekosistem",
-desc: "Mengenal hubungan antar makhluk hidup."
-},
-{
-id: 3,
-title: "Simbiosis",
-cat: "🤝 Interaksi",
-desc: "Simulasi mutualisme, komensalisme, dan parasitisme."
+desc: "Simulasi interaktif rantai makanan dalam ekosistem."
 }
 ];
 const videoMateri = {
@@ -715,7 +703,9 @@ function renderLabGuru() {
             <div class="text-xs font-medium text-primary-600 bg-primary-50 rounded-full px-3 py-1 inline-block mb-3">${l.cat}</div>
             <h3 class="font-semibold text-gray-800 mb-2">${l.title}</h3>
             <p class="text-sm text-gray-500 mb-4">${l.desc}</p>
-            <button class="w-full py-2 bg-primary-600 text-white rounded-lg text-xs font-medium hover:bg-primary-700">▶ Mulai Simulasi</button>
+            <button
+onclick="window.open('https://gizmos.explorelearning.com/find-gizmos/launch-gizmo?resourceId=381','_blank')"
+class="w-full py-2 bg-primary-600 text-white rounded-lg text-xs font-medium hover:bg-primary-700">▶ Mulai Simulasi</button>
         </div>`).join('')}
     </div>`, 'lab-guru');
 }
@@ -975,7 +965,13 @@ function renderLabSiswa() {
             <div class="text-xs font-medium text-accent-600 bg-accent-50 rounded-full px-3 py-1 inline-block mb-3">${l.cat}</div>
             <h3 class="font-semibold text-gray-800 mb-2 text-sm">${l.title}</h3>
             <p class="text-xs text-gray-500 mb-4">${l.desc}</p>
-            <button class="w-full py-2 bg-accent-500 text-white rounded-lg text-xs font-medium hover:bg-accent-600">▶ Mulai Eksperimen</button>
+            <button
+onclick="window.open('https://gizmos.explorelearning.com/find-gizmos/launch-gizmo?resourceId=381','_blank')"
+class="w-full py-2 bg-accent-500 text-white rounded-lg text-xs font-medium hover:bg-accent-600">
+
+🚀 Mulai Eksplorasi
+
+</button>
         </div>`).join('')}
     </div>`, 'lab-siswa');
 }
