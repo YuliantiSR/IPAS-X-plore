@@ -979,84 +979,98 @@ class="w-full py-2 bg-accent-500 text-white rounded-lg text-xs font-medium hover
 
 function renderProyekSiswa() {
     return siswaLayout(`
-    <div class="mb-6"><h1 class="text-2xl font-bold text-gray-800">🌍 Proyek IPAS</h1></div>
-    <div class="grid md:grid-cols-2 gap-4">
-        ${proyekList.map(p=>`
-        <div class="bg-white rounded-2xl shadow-sm p-5 card-hover">
-            <div class="flex items-center gap-3 mb-3"><span class="text-3xl">${p.icon}</span><div><h3 class="font-semibold text-gray-800 text-sm">${p.title}</h3><span class="text-xs text-gray-400">Deadline: ${p.deadline}</span></div></div>
-            <div class="flex justify-between text-xs text-gray-500 mb-1"><span>Progress</span><span>${p.progress}%</span></div>
-            <div class="bg-white rounded-2xl shadow-sm p-5 card-hover">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">
+            🌿 Proyek IPAS
+        </h1>
+    </div>
 
-<div class="flex items-center gap-3 mb-4">
-<span class="text-4xl">${p.icon}</span>
-<div>
-<h3 class="font-bold text-gray-800">${p.title}</h3>
-<p class="text-xs text-gray-500">
-📅 Deadline: ${p.deadline}
-</p>
-</div>
-</div>
+    <div class="bg-white rounded-2xl shadow-sm p-6">
 
-<div class="bg-green-50 rounded-xl p-4 mb-4">
+        <div class="flex items-center gap-3 mb-4">
+            <span class="text-5xl">🌿</span>
 
-<h4 class="font-semibold text-green-700 mb-2">
-🎯 Tujuan Proyek
-</h4>
+            <div>
+                <h2 class="text-xl font-bold text-gray-800">
+                    Observasi Ekosistem Sekolah
+                </h2>
 
-<p class="text-sm text-gray-700">
-Mengidentifikasi komponen penyusun ekosistem di lingkungan sekolah.
-</p>
+                <p class="text-sm text-gray-500">
+                    📅 Deadline : 30 Juni 2026
+                </p>
+            </div>
+        </div>
 
-</div>
+        <div class="bg-green-50 rounded-xl p-4 mb-5">
 
-<div class="space-y-2 mb-4">
+            <h3 class="font-bold text-green-700 mb-2">
+                🎯 Tujuan Proyek
+            </h3>
 
-<p class="text-sm font-semibold text-gray-700">
-📋 Aktivitas:
-</p>
+            <p class="text-sm text-gray-700">
+                Mengidentifikasi komponen penyusun ekosistem di lingkungan sekolah.
+            </p>
 
-<p class="text-sm">✅ Amati ekosistem di sekitar sekolah.</p>
+        </div>
 
-<p class="text-sm">📷 Ambil foto lokasi pengamatan.</p>
+        <div class="mb-5">
 
-<p class="text-sm">🌱 Catat komponen biotik.</p>
+            <h3 class="font-bold text-gray-700 mb-3">
+                📋 Aktivitas Proyek
+            </h3>
 
-<p class="text-sm">🪨 Catat komponen abiotik.</p>
+            <div class="space-y-2 text-sm">
 
-<p class="text-sm">🗣 Presentasikan hasil pengamatan.</p>
+                <p>✅ Amati ekosistem di sekitar sekolah.</p>
 
-</div>
+                <p>📷 Ambil foto lokasi pengamatan.</p>
 
-<div class="flex justify-between text-xs text-gray-500 mb-2">
-<span>Progress</span>
-<span>${p.progress}%</span>
-</div>
+                <p>🌱 Catat komponen biotik.</p>
 
-<div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
-<div
-class="h-full bg-gradient-to-r from-accent-400 to-accent-500 rounded-full progress-bar"
-style="width:${p.progress}%">
-</div>
-</div>
+                <p>🪨 Catat komponen abiotik.</p>
 
-<p class="text-sm text-gray-500 text-center mt-4 mb-3">
+                <p>🗣 Presentasikan hasil pengamatan.</p>
 
-📌 Setelah menyelesaikan proyek, kirimkan hasil observasi melalui formulir berikut.
+            </div>
 
-</p>
-<button
-onclick="window.open('https://forms.gle/q2kdB9mLEjpcnhnS6','_blank')"
-class="w-full mt-4 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700">
+        </div>
 
-🚀 Kirim Hasil Observasi
+        <div class="mb-2 flex justify-between text-sm text-gray-500">
+            <span>Progress</span>
+            <span>0%</span>
+        </div>
 
-</button>
+        <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden mb-4">
 
-</div>
+            <div
+            class="h-full bg-gradient-to-r from-green-400 to-green-600"
+            style="width:0%">
 
-</div>
-        </div>`).join('')}
-    </div>`, 'proyek-siswa');
+            </div>
+
+        </div>
+
+        <div class="bg-blue-50 rounded-xl p-3 mb-4">
+
+            <p class="text-sm text-blue-700 text-center">
+
+                📌 Setelah menyelesaikan proyek,
+                kirimkan hasil observasi melalui formulir berikut.
+
+            </p>
+
+        </div>
+
+        <button
+        onclick="window.open('https://forms.gle/q2kdB9mLEjpcnhnS6','_blank')"
+        class="w-full py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700">
+
+            🚀 Kirim Hasil Observasi
+
+        </button>
+
+    </div>
+    `, 'proyek-siswa');
 }
 
 function renderKerjakanSoal() {
